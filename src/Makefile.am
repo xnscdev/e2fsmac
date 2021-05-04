@@ -14,6 +14,7 @@ KEXTLIBSFLAGS = -xml -unsupported -undef-symbols
 noinst_PROGRAMS = e2fsmac
 
 e2fsmac_SOURCES =	\
+	e2fsmac.h	\
 	init.c
 
 e2fsmac_LDFLAGS = -mmacosx-version-min=$(sdkversion) -nostdlib -Wl,-kext \

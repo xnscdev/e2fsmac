@@ -14,18 +14,19 @@
    You should have received a copy of the GNU General Public License
    along with e2fsmac. If not, see <https://www.gnu.org/licenses/>. */
 
-#include <libkern/libkern.h>
-#include <mach/mach_types.h>
+#include "e2fsmac.h"
 
 kern_return_t
 e2fsmac_start (kmod_info_t *kinfo, void *data)
 {
+  log ("start");
   return KERN_SUCCESS;
 }
 
 kern_return_t
 e2fsmac_stop (kmod_info_t *kinfo, void *data)
 {
+  log ("stop");
   return KERN_SUCCESS;
 }
 
