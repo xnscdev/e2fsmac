@@ -21,18 +21,66 @@
 #include <libkern/libkern.h>
 #include <libkern/locks.h>
 #include <mach/mach_types.h>
-#include <sys/systm.h>
 #include <sys/mount.h>
 #include <sys/vnode.h>
 
-#define E2FS_VFS_FLAGS (VFS_TBLTHREADSAFE | \
-			VFS_TBLFSNODELOCK | \
-			VFS_TBLNOTYPENUM  | \
-			VFS_TBLLOCALVOL   | \
-			VFS_TBL64BITREADY)
-
 #define E2FS_LCK_GRP_NAME KEXT_BUNDLEID ".lock"
 
+#define E2FS_VFS_FLAGS      (VFS_TBLTHREADSAFE		\
+			     | VFS_TBLFSNODELOCK	\
+			     | VFS_TBLNOTYPENUM		\
+			     | VFS_TBLLOCALVOL		\
+			     | VFS_TBL64BITREADY)
+#define EXT2_CAPABILITIES   (VOL_CAP_FMT_SYMBOLICLINKS		\
+			     | VOL_CAP_FMT_HARDLINKS		\
+			     | VOL_CAP_FMT_CASE_SENSITIVE	\
+			     | VOL_CAP_FMT_CASE_PRESERVING	\
+			     | VOL_CAP_FMT_2TB_FILESIZE		\
+			     | VOL_CAP_FMT_OPENDENYMODES)
+#define EXT2_INTERFACES     VOL_CAP_INT_ATTRLIST
+#define EXT2_ATTR_CMN       (ATTR_CMN_NAME		\
+			     | ATTR_CMN_DEVID		\
+			     | ATTR_CMN_FSID		\
+			     | ATTR_CMN_OBJTYPE		\
+			     | ATTR_CMN_OBJID		\
+			     | ATTR_CMN_PAROBJID	\
+			     | ATTR_CMN_CRTIME		\
+			     | ATTR_CMN_MODTIME		\
+			     | ATTR_CMN_CHGTIME		\
+			     | ATTR_CMN_ACCTIME		\
+			     | ATTR_CMN_OWNERID		\
+			     | ATTR_CMN_GRPID		\
+			     | ATTR_CMN_ACCESSMASK	\
+			     | ATTR_CMN_FLAGS)
+#define EXT2_ATTR_DIR       (ATTR_DIR_LINKCOUNT		\
+			     | ATTR_DIR_ALLOCSIZE	\
+			     | ATTR_DIR_IOBLOCKSIZE	\
+			     | ATTR_DIR_DATALENGTH)
+#define EXT2_ATTR_FILE      (ATTR_FILE_LINKCOUNT	\
+			     | ATTR_FILE_TOTALSIZE	\
+			     | ATTR_FILE_ALLOCSIZE	\
+			     | ATTR_FILE_IOBLOCKSIZE	\
+			     | ATTR_FILE_DEVTYPE	\
+			     | ATTR_FILE_DATALENGTH	\
+			     | ATTR_FILE_DATAALLOCSIZE)
+#define EXT2_ATTR_FORK      0
+#define EXT2_ATTR_VOL       (ATTR_VOL_FSTYPE		\
+			     | ATTR_VOL_SIZE		\
+			     | ATTR_VOL_SPACEFREE	\
+			     | ATTR_VOL_SPACEAVAIL	\
+			     | ATTR_VOL_IOBLOCKSIZE	\
+			     | ATTR_VOL_OBJCOUNT	\
+			     | ATTR_VOL_FILECOUNT	\
+			     | ATTR_VOL_DIRCOUNT	\
+			     | ATTR_VOL_MAXOBJCOUNT	\
+			     | ATTR_VOL_MOUNTPOINT	\
+			     | ATTR_VOL_NAME		\
+			     | ATTR_VOL_MOUNTFLAGS	\
+			     | ATTR_VOL_MOUNTEDDEVICE	\
+			     | ATTR_VOL_CAPABILITIES	\
+			     | ATTR_VOL_UUID		\
+			     | ATTR_VOL_RESERVED_SIZE	\
+			     | ATTR_VOL_ATTRIBUTES)
 #define EXT2_NAME           "ext2"
 #define EXT2_VOLNAME_MAXLEN 16
 
@@ -142,7 +190,6 @@ struct ext2_mount
   dev_t devid;
   vnode_t devvp;
   char volname[EXT2_VOLNAME_MAXLEN];
-  struct vfs_attr attr;
   lck_mtx_t *mtx_root;
   unsigned char attach_root;
   unsigned char wait_root;
@@ -163,5 +210,12 @@ extern lck_grp_t *e2fs_lck_grp;
 extern struct vfsops ext2_vfsops;
 extern struct vnodeopv_desc *ext2_vnopv_desc_list[1];
 extern int (**ext2_vnop_p) (void *);
+
+void *kmalloc (size_t size, int flags);
+void *krealloc (void *ptr, size_t old, size_t new, int flags);
+void kfree (void *ptr);
+#ifdef DEBUG
+void kmemassert (void);
+#endif
 
 #endif

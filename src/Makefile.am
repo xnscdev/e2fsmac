@@ -16,9 +16,10 @@ noinst_PROGRAMS = e2fsmac
 
 e2fsmac_SOURCES =	\
 	e2fsmac.h	\
+	ext2-vfsops.c	\
+	ext2-vnops.c	\
 	init.c		\
-	vfsops.c	\
-	vnops.c
+	malloc.c
 
 e2fsmac_LDFLAGS = -mmacosx-version-min=$(sdkversion) -nostdlib -Wl,-kext \
 	-Wl,-export_dynamic

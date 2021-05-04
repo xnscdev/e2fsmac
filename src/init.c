@@ -69,6 +69,9 @@ e2fsmac_stop (kmod_info_t *kinfo, void *data)
     }
 
   lck_grp_free (e2fs_lck_grp);
+#ifdef DEBUG
+  kmemassert ();
+#endif
   return KERN_SUCCESS;
 }
 
