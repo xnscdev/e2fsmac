@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+"http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>BuildMachineOSBuild</key>
+    <string>@SYS_BUILD@</string>
+    <key>CFBundleExecutable</key>
+    <string>@KEXT_EXE@</string>
+    <key>CFBundleIdentifier</key>
+    <string>@KEXT_BUNDLEID@</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundlePackageType</key>
+    <string>KEXT</string>
+    <key>CFBundleVersion</key>
+    <string>@KEXT_VERSION@</string>
+    <key>CFBundleShortVersionString</key>
+    <string>@KEXT_BUILD@</string>
+    <key>CFBundleSupportedPlatforms</key>
+    <array>
+      <string>MacOSX</string>
+    </array>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright (C) XNSC 2020</string>
+    KEXTLIBS
+  </dict>
+</plist>
