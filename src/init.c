@@ -16,17 +16,59 @@
 
 #include "e2fsmac.h"
 
+lck_grp_t *e2fs_lck_grp;
+
+static vfstable_t ext2_vfstable_ref;
+
+static struct vfs_fsentry ext2_vfsentry = {
+  &ext2_vfsops,
+  sizeof (ext2_vnopv_desc_list) / sizeof (ext2_vnopv_desc_list[0]),
+  ext2_vnopv_desc_list,
+  0,
+  EXT2_NAME,
+  E2FS_VFS_FLAGS,
+  {NULL, NULL}
+};
+
 kern_return_t
 e2fsmac_start (kmod_info_t *kinfo, void *data)
 {
-  log ("start");
+  kern_return_t err;
+  log ("starting");
+  log_debug ("built with Apple LLVM %s", __clang_version__);
+
+  e2fs_lck_grp = lck_grp_alloc_init (E2FS_LCK_GRP_NAME, LCK_GRP_ATTR_NULL);
+  if (e2fs_lck_grp == NULL)
+    {
+      log ("failed to allocate lock group");
+      return KERN_FAILURE;
+    }
+
+  err = vfs_fsadd (&ext2_vfsentry, &ext2_vfstable_ref);
+  if (err != 0)
+    {
+      log ("failed to register ext2 filesystem (errno %d)", err);
+      lck_grp_free (e2fs_lck_grp);
+      return KERN_FAILURE;
+    }
+  log_debug ("successfully registered ext2 filesystem");
   return KERN_SUCCESS;
 }
 
 kern_return_t
 e2fsmac_stop (kmod_info_t *kinfo, void *data)
 {
-  log ("stop");
+  kern_return_t err;
+  log ("stopping");
+
+  err = vfs_fsremove (ext2_vfstable_ref);
+  if (err != 0)
+    {
+      log ("failed to remove filesystem (errno %d)", err);
+      return KERN_FAILURE;
+    }
+
+  lck_grp_free (e2fs_lck_grp);
   return KERN_SUCCESS;
 }
 

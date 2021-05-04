@@ -1,7 +1,8 @@
 KEXT_BUNDLE = $(KEXT_NAME).kext
 
 AM_CPPFLAGS = -DKERNEL -DKERNEL_PRIVATE -DDRIVER_PRIVATE -DAPPLE -DNeXT \
-	-DNO_XCODE -DKEXT_NAME=\"$(KEXT_NAME)\" -DKEXT_BUNDLE=$(KEXT_BUNDLE) \
+	-DNO_XCODE -DKEXT_NAME=\"$(KEXT_NAME)\" \
+	-DKEXT_BUNDLEID=\"$(KEXT_BUNDLEID)\" \
 	-DKEXT_VERSION=\"$(KEXT_VERSION)\" -DKEXT_BUILD=$(KEXT_BUILD) \
 	-I$(sdkdir)/System/Library/Frameworks/Kernel.framework/Headers \
 	-I$(sdkdir)/System/Library/Frameworks/Kernel.framework/PrivateHeaders \
@@ -15,7 +16,9 @@ noinst_PROGRAMS = e2fsmac
 
 e2fsmac_SOURCES =	\
 	e2fsmac.h	\
-	init.c
+	init.c		\
+	vfsops.c	\
+	vnops.c
 
 e2fsmac_LDFLAGS = -mmacosx-version-min=$(sdkversion) -nostdlib -Wl,-kext \
 	-Wl,-export_dynamic
