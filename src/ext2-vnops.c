@@ -16,44 +16,6 @@
 
 #include "e2fsmac.h"
 
-int (**ext2_vnop_p) (void *);
-
-static int
-ext2_lookup (struct vnop_lookup_args *args)
-{
-  return ENOTSUP;
-}
-
-static int
-ext2_open (struct vnop_open_args *args)
-{
-  return ENOTSUP;
-}
-
-static int
-ext2_close (struct vnop_close_args *args)
-{
-  return ENOTSUP;
-}
-
-static int
-ext2_getattr (struct vnop_getattr_args *args)
-{
-  return ENOTSUP;
-}
-
-static int
-ext2_readdir (struct vnop_readdir_args *args)
-{
-  return ENOTSUP;
-}
-
-static int
-ext2_reclaim (struct vnop_reclaim_args *args)
-{
-  return ENOTSUP;
-}
-
 static struct vnodeopv_entry_desc ext2_vnopv_entry_desc_list[] = {
   {&vnop_default_desc, (int (*) (void *)) vn_default_error},
   {&vnop_lookup_desc, (int (*) (void *)) ext2_lookup},
@@ -73,3 +35,41 @@ static struct vnodeopv_desc ext2_vnopv_desc = {
 struct vnodeopv_desc *ext2_vnopv_desc_list[1] = {
   &ext2_vnopv_desc
 };
+
+int (**ext2_vnop_p) (void *);
+
+int
+ext2_lookup (struct vnop_lookup_args *args)
+{
+  return ENOTSUP;
+}
+
+int
+ext2_open (struct vnop_open_args *args)
+{
+  return ENOTSUP;
+}
+
+int
+ext2_close (struct vnop_close_args *args)
+{
+  return ENOTSUP;
+}
+
+int
+ext2_getattr (struct vnop_getattr_args *args)
+{
+  return ENOTSUP;
+}
+
+int
+ext2_readdir (struct vnop_readdir_args *args)
+{
+  return ENOTSUP;
+}
+
+int
+ext2_reclaim (struct vnop_reclaim_args *args)
+{
+  return ENOTSUP;
+}

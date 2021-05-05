@@ -185,7 +185,6 @@ struct ext2_inode
 
 struct ext2_mount
 {
-  uint32_t magic;
   mount_t mp;
   dev_t devid;
   vnode_t devvp;
@@ -217,5 +216,20 @@ void kfree (void *ptr);
 #ifdef DEBUG
 void kmemassert (void);
 #endif
+
+int ext2_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
+		vfs_context_t ctx);
+int ext2_start (struct mount *mp, int flags, vfs_context_t ctx);
+int ext2_unmount (struct mount *mp, int flags, vfs_context_t ctx);
+int ext2_root (struct mount *mp, vnode_t *vpp, vfs_context_t ctx);
+int ext2_getvfsattr (struct mount *mp, struct vfs_attr *attr,
+		     vfs_context_t ctx);
+
+int ext2_lookup (struct vnop_lookup_args *args);
+int ext2_open (struct vnop_open_args *args);
+int ext2_close (struct vnop_close_args *args);
+int ext2_getattr (struct vnop_getattr_args *args);
+int ext2_readdir (struct vnop_readdir_args *args);
+int ext2_reclaim (struct vnop_reclaim_args *args);
 
 #endif
