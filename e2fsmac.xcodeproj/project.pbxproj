@@ -8,12 +8,42 @@
 
 /* Begin PBXBuildFile section */
 		6ABB369229DE909C000961B3 /* init.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB369129DE909C000961B3 /* init.c */; };
+		6ABB369B29DE9680000961B3 /* ext2fs.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB369A29DE9680000961B3 /* ext2fs.h */; };
+		6ABB369D29DE9775000961B3 /* ext2_fs.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB369C29DE9775000961B3 /* ext2_fs.h */; };
+		6ABB36A429DE9833000961B3 /* ext2_ext_attr.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB369E29DE9833000961B3 /* ext2_ext_attr.h */; };
+		6ABB36A529DE9833000961B3 /* ext3_extents.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB369F29DE9833000961B3 /* ext3_extents.h */; };
+		6ABB36A629DE9833000961B3 /* ext2_err.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36A029DE9833000961B3 /* ext2_err.h */; };
+		6ABB36A729DE9833000961B3 /* com_err.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36A129DE9833000961B3 /* com_err.h */; };
+		6ABB36A829DE9833000961B3 /* ext2_io.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36A229DE9833000961B3 /* ext2_io.h */; };
+		6ABB36A929DE9833000961B3 /* ext2_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36A329DE9833000961B3 /* ext2_types.h */; };
+		6ABB36AB29DE98B3000961B3 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36AA29DE98B3000961B3 /* config.h */; };
+		6ABB36AD29DE98D9000961B3 /* dirpaths.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36AC29DE98D9000961B3 /* dirpaths.h */; };
+		6ABB36AF29DE9960000961B3 /* hashmap.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36AE29DE9960000961B3 /* hashmap.h */; };
+		6ABB36B129DE9985000961B3 /* bitops.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36B029DE9982000961B3 /* bitops.h */; };
+		6ABB36B329DE9A4C000961B3 /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36B229DE9A4C000961B3 /* util.h */; };
+		6ABB36B529DF0EB2000961B3 /* malloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB36B429DF0EB2000961B3 /* malloc.c */; };
+		6ABB36B729DF1B02000961B3 /* ext2fsP.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36B629DF1B02000961B3 /* ext2fsP.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		6ABB368E29DE909C000961B3 /* e2fsmac.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = e2fsmac.kext; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ABB369129DE909C000961B3 /* init.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = init.c; sourceTree = "<group>"; };
 		6ABB369329DE909C000961B3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6ABB369A29DE9680000961B3 /* ext2fs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ext2fs.h; sourceTree = "<group>"; };
+		6ABB369C29DE9775000961B3 /* ext2_fs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ext2_fs.h; sourceTree = "<group>"; };
+		6ABB369E29DE9833000961B3 /* ext2_ext_attr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ext2_ext_attr.h; sourceTree = "<group>"; };
+		6ABB369F29DE9833000961B3 /* ext3_extents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ext3_extents.h; sourceTree = "<group>"; };
+		6ABB36A029DE9833000961B3 /* ext2_err.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ext2_err.h; sourceTree = "<group>"; };
+		6ABB36A129DE9833000961B3 /* com_err.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = com_err.h; sourceTree = "<group>"; };
+		6ABB36A229DE9833000961B3 /* ext2_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ext2_io.h; sourceTree = "<group>"; };
+		6ABB36A329DE9833000961B3 /* ext2_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ext2_types.h; sourceTree = "<group>"; };
+		6ABB36AA29DE98B3000961B3 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		6ABB36AC29DE98D9000961B3 /* dirpaths.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dirpaths.h; sourceTree = "<group>"; };
+		6ABB36AE29DE9960000961B3 /* hashmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hashmap.h; sourceTree = "<group>"; };
+		6ABB36B029DE9982000961B3 /* bitops.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitops.h; sourceTree = "<group>"; };
+		6ABB36B229DE9A4C000961B3 /* util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
+		6ABB36B429DF0EB2000961B3 /* malloc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = malloc.c; sourceTree = "<group>"; };
+		6ABB36B629DF1B02000961B3 /* ext2fsP.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ext2fsP.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -30,6 +60,7 @@
 		6ABB368429DE909B000961B3 = {
 			isa = PBXGroup;
 			children = (
+				6ABB369929DE9597000961B3 /* libext2fs */,
 				6ABB369029DE909C000961B3 /* e2fsmac */,
 				6ABB368F29DE909C000961B3 /* Products */,
 			);
@@ -47,9 +78,31 @@
 			isa = PBXGroup;
 			children = (
 				6ABB369129DE909C000961B3 /* init.c */,
+				6ABB36B229DE9A4C000961B3 /* util.h */,
 				6ABB369329DE909C000961B3 /* Info.plist */,
+				6ABB36B429DF0EB2000961B3 /* malloc.c */,
 			);
 			path = e2fsmac;
+			sourceTree = "<group>";
+		};
+		6ABB369929DE9597000961B3 /* libext2fs */ = {
+			isa = PBXGroup;
+			children = (
+				6ABB36B029DE9982000961B3 /* bitops.h */,
+				6ABB36AE29DE9960000961B3 /* hashmap.h */,
+				6ABB36AC29DE98D9000961B3 /* dirpaths.h */,
+				6ABB36AA29DE98B3000961B3 /* config.h */,
+				6ABB36A129DE9833000961B3 /* com_err.h */,
+				6ABB36A029DE9833000961B3 /* ext2_err.h */,
+				6ABB369E29DE9833000961B3 /* ext2_ext_attr.h */,
+				6ABB36A229DE9833000961B3 /* ext2_io.h */,
+				6ABB36A329DE9833000961B3 /* ext2_types.h */,
+				6ABB369F29DE9833000961B3 /* ext3_extents.h */,
+				6ABB369A29DE9680000961B3 /* ext2fs.h */,
+				6ABB369C29DE9775000961B3 /* ext2_fs.h */,
+				6ABB36B629DF1B02000961B3 /* ext2fsP.h */,
+			);
+			path = libext2fs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -59,6 +112,20 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6ABB36B329DE9A4C000961B3 /* util.h in Headers */,
+				6ABB36A829DE9833000961B3 /* ext2_io.h in Headers */,
+				6ABB36AF29DE9960000961B3 /* hashmap.h in Headers */,
+				6ABB36A929DE9833000961B3 /* ext2_types.h in Headers */,
+				6ABB36B129DE9985000961B3 /* bitops.h in Headers */,
+				6ABB36B729DF1B02000961B3 /* ext2fsP.h in Headers */,
+				6ABB36AB29DE98B3000961B3 /* config.h in Headers */,
+				6ABB36A729DE9833000961B3 /* com_err.h in Headers */,
+				6ABB369D29DE9775000961B3 /* ext2_fs.h in Headers */,
+				6ABB36A629DE9833000961B3 /* ext2_err.h in Headers */,
+				6ABB369B29DE9680000961B3 /* ext2fs.h in Headers */,
+				6ABB36AD29DE98D9000961B3 /* dirpaths.h in Headers */,
+				6ABB36A529DE9833000961B3 /* ext3_extents.h in Headers */,
+				6ABB36A429DE9833000961B3 /* ext2_ext_attr.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,6 +198,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6ABB369229DE909C000961B3 /* init.c in Sources */,
+				6ABB36B529DF0EB2000961B3 /* malloc.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -256,8 +324,9 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z42A5SD27J;
 				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = e2fsmac/Info.plist;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "GNU General Public License version 3.0 or later";
 				MACOSX_DEPLOYMENT_TARGET = 12.1;
 				MARKETING_VERSION = 1.0;
 				MODULE_NAME = com.github.xnscdev.e2fsmac;
@@ -280,8 +349,9 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z42A5SD27J;
 				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = e2fsmac/Info.plist;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "GNU General Public License version 3.0 or later";
 				MACOSX_DEPLOYMENT_TARGET = 12.1;
 				MARKETING_VERSION = 1.0;
 				MODULE_NAME = com.github.xnscdev.e2fsmac;

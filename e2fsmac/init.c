@@ -14,6 +14,7 @@
    along with this program. If not, see <https://www.gnu.org/licenses/>. */
 
 #include <mach/mach_types.h>
+#include "ext2fsP.h"
 
 kern_return_t
 e2fsmac_start (kmod_info_t *ki, void *d)
