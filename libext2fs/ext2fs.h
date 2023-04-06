@@ -71,8 +71,7 @@ extern "C" {
 #include <sys/types.h>
 #endif
 
-#include "util.h"
-#include <sys/malloc.h>
+#include "e2fsmac.h"
 #include <string.h>
 
 #if EXT2_FLAT_INCLUDES

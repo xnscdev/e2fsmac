@@ -20,9 +20,11 @@
 		6ABB36AD29DE98D9000961B3 /* dirpaths.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36AC29DE98D9000961B3 /* dirpaths.h */; };
 		6ABB36AF29DE9960000961B3 /* hashmap.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36AE29DE9960000961B3 /* hashmap.h */; };
 		6ABB36B129DE9985000961B3 /* bitops.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36B029DE9982000961B3 /* bitops.h */; };
-		6ABB36B329DE9A4C000961B3 /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36B229DE9A4C000961B3 /* util.h */; };
+		6ABB36B329DE9A4C000961B3 /* e2fsmac.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36B229DE9A4C000961B3 /* e2fsmac.h */; };
 		6ABB36B529DF0EB2000961B3 /* malloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB36B429DF0EB2000961B3 /* malloc.c */; };
 		6ABB36B729DF1B02000961B3 /* ext2fsP.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36B629DF1B02000961B3 /* ext2fsP.h */; };
+		6ABB378629DF38B7000961B3 /* vfsops.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB378529DF38B7000961B3 /* vfsops.c */; };
+		6ABB378829DF458B000961B3 /* vnops.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB378729DF458B000961B3 /* vnops.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,9 +43,11 @@
 		6ABB36AC29DE98D9000961B3 /* dirpaths.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dirpaths.h; sourceTree = "<group>"; };
 		6ABB36AE29DE9960000961B3 /* hashmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hashmap.h; sourceTree = "<group>"; };
 		6ABB36B029DE9982000961B3 /* bitops.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitops.h; sourceTree = "<group>"; };
-		6ABB36B229DE9A4C000961B3 /* util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
+		6ABB36B229DE9A4C000961B3 /* e2fsmac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = e2fsmac.h; sourceTree = "<group>"; };
 		6ABB36B429DF0EB2000961B3 /* malloc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = malloc.c; sourceTree = "<group>"; };
 		6ABB36B629DF1B02000961B3 /* ext2fsP.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ext2fsP.h; sourceTree = "<group>"; };
+		6ABB378529DF38B7000961B3 /* vfsops.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = vfsops.c; sourceTree = "<group>"; };
+		6ABB378729DF458B000961B3 /* vnops.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = vnops.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,9 +82,11 @@
 			isa = PBXGroup;
 			children = (
 				6ABB369129DE909C000961B3 /* init.c */,
-				6ABB36B229DE9A4C000961B3 /* util.h */,
+				6ABB36B229DE9A4C000961B3 /* e2fsmac.h */,
 				6ABB369329DE909C000961B3 /* Info.plist */,
 				6ABB36B429DF0EB2000961B3 /* malloc.c */,
+				6ABB378529DF38B7000961B3 /* vfsops.c */,
+				6ABB378729DF458B000961B3 /* vnops.c */,
 			);
 			path = e2fsmac;
 			sourceTree = "<group>";
@@ -112,7 +118,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6ABB36B329DE9A4C000961B3 /* util.h in Headers */,
+				6ABB36B329DE9A4C000961B3 /* e2fsmac.h in Headers */,
 				6ABB36A829DE9833000961B3 /* ext2_io.h in Headers */,
 				6ABB36AF29DE9960000961B3 /* hashmap.h in Headers */,
 				6ABB36A929DE9833000961B3 /* ext2_types.h in Headers */,
@@ -199,6 +205,8 @@
 			files = (
 				6ABB369229DE909C000961B3 /* init.c in Sources */,
 				6ABB36B529DF0EB2000961B3 /* malloc.c in Sources */,
+				6ABB378829DF458B000961B3 /* vnops.c in Sources */,
+				6ABB378629DF38B7000961B3 /* vfsops.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
