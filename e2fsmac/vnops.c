@@ -16,7 +16,6 @@
 #include <sys/fcntl.h>
 #include <sys/dirent.h>
 #include "e2fsmac.h"
-#include "ext2fs.h"
 
 int (**ext2_vnop_p) (void *);
 
@@ -38,20 +37,20 @@ uiomove_atomic (void *addr, size_t size, uio_t uio)
 }
 
 static void
-ext2_assert_valid_vnode (vnode_t vn)
+ext2_assert_valid_vnode (vnode_t vp)
 {
 #ifdef DEBUG
-  struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vn));
+  struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vp));
   int valid;
   lck_mtx_lock (emp->mtx_root);
-  valid = vn == emp->rootvp;
+  valid = vp == emp->rootvp;
   lck_mtx_unlock (emp->mtx_root);
   kassert (valid);
 #endif
 }
 
 static void
-ext2_detach_root_vnode (struct ext2_mount *emp, vnode_t vn)
+ext2_detach_root_vnode (struct ext2_mount *emp, vnode_t vp)
 {
   int err;
   lck_mtx_lock (emp->mtx_root);
@@ -59,7 +58,7 @@ ext2_detach_root_vnode (struct ext2_mount *emp, vnode_t vn)
     kassert (!emp->rootvp);
   if (emp->rootvp)
     {
-      kassert (emp->rootvp == vn);
+      kassert (emp->rootvp == vp);
       err = vnode_removefsref (emp->rootvp);
       kassert (!err);
       emp->rootvp = NULL;
@@ -75,57 +74,47 @@ static int ext2_vnop_default (struct vnop_generic_args *args)
 static int ext2_vnop_lookup (struct vnop_lookup_args *args)
 {
   errno_t err;
-  struct vnodeop_desc *desc = args->a_desc;
   vnode_t dvp = args->a_dvp;
-  vnode_t *vp = args->a_vpp;
+  vnode_t *vpp = args->a_vpp;
   struct componentname *cnp = args->a_cnp;
-  vfs_context_t ctx = args->a_context;
-  vnode_t vn = NULL;
+  vnode_t vp = NULL;
   kassert (vnode_isdir (dvp));
 
   if ((cnp->cn_flags & ISDOTDOT) || !strcmp (cnp->cn_nameptr, "."))
     {
       err = vnode_get (dvp);
       if (!err)
-	vn = dvp;
+	vp = dvp;
     }
   else
     err = ENOENT;
 
-  *vp = vn;
+  *vpp = vp;
   return err;
 }
 
 static int
 ext2_vnop_open (struct vnop_open_args *args)
 {
-  struct vnodeop_desc *desc = args->a_desc;
-  vnode_t vn = args->a_vp;
-  int mode = args->a_mode;
-  vfs_context_t ctx = args->a_context;
-  log_debug ("ext2 open: vnode %#x", vnode_vid (vn));
+  vnode_t vp = args->a_vp;
+  log_debug ("ext2 open: vnode %#x", vnode_vid (vp));
   return 0;
 }
 
 static int
 ext2_vnop_close (struct vnop_close_args *args)
 {
-  struct vnodeop_desc *desc = args->a_desc;
-  vnode_t vn = args->a_vp;
-  int fflag = args->a_fflag;
-  vfs_context_t ctx = args->a_context;
-  log_debug ("ext2 close: vnode %#x", vnode_vid (vn));
+  vnode_t vp = args->a_vp;
+  log_debug ("ext2 close: vnode %#x", vnode_vid (vp));
   return 0;
 }
 
 static int
 ext2_vnop_getattr (struct vnop_getattr_args *args)
 {
-  struct vnodeop_desc *desc = args->a_desc;
-  vnode_t vn = args->a_vp;
+  vnode_t vp = args->a_vp;
   struct vnode_attr *vap = args->a_vap;
-  vfs_context_t ctx = args->a_context;
-  struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vn));
+  struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vp));
 
   VATTR_RETURN (vap, va_rdev, 0);
   VATTR_RETURN (vap, va_nlink, 2);
@@ -149,13 +138,10 @@ ext2_vnop_readdir (struct vnop_readdir_args *args)
     | VNODE_READDIR_SEEKOFF32
     | VNODE_READDIR_NAMEMAX;
   int err = 0;
-  struct vnodeop_desc *desc = args->a_desc;
-  vnode_t vn = args->a_vp;
   struct uio *uio = args->a_uio;
   int flags = args->a_flags;
   int *eofflag = args->a_eofflag;
   int *numdirent = args->a_numdirent;
-  vfs_context_t ctx = args->a_context;
   int eof = 0;
   int num = 0;
   struct dirent di;
@@ -222,11 +208,9 @@ ext2_vnop_readdir (struct vnop_readdir_args *args)
 static int
 ext2_vnop_reclaim (struct vnop_reclaim_args *args)
 {
-  struct vnodeop_desc *desc = args->a_desc;
-  vnode_t vn = args->a_vp;
-  vfs_context_t ctx = args->a_context;
-  struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vn));
-  ext2_detach_root_vnode (emp, vn);
+  vnode_t vp = args->a_vp;
+  struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vp));
+  ext2_detach_root_vnode (emp, vp);
   return 0;
 }
 

@@ -16,7 +16,6 @@
 #include <sys/kauth.h>
 #include <sys/systm.h>
 #include "e2fsmac.h"
-#include "ext2fs.h"
 
 static int ext2_vfsop_unmount (struct mount *mp, int flags, vfs_context_t ctx);
 
@@ -278,7 +277,7 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
       goto err0;
     }
 
-  emp->magic = EXT2_SUPER_MAGIC;
+  emp->magic = EXT2_ARGS_MAGIC;
   emp->mp = mp;
   emp->resuid = args.resuid;
   emp->resgid = args.resgid;

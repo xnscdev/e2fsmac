@@ -15,7 +15,6 @@
 
 #include <mach/mach_types.h>
 #include "e2fsmac.h"
-#include "ext2fsP.h"
 
 #define E2FS_VFS_FLAGS          (VFS_TBLTHREADSAFE	\
 				 | VFS_TBLFSNODELOCK	\
