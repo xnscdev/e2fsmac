@@ -25,7 +25,21 @@
 		6ABB36B729DF1B02000961B3 /* ext2fsP.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36B629DF1B02000961B3 /* ext2fsP.h */; };
 		6ABB378629DF38B7000961B3 /* vfsops.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB378529DF38B7000961B3 /* vfsops.c */; };
 		6ABB378829DF458B000961B3 /* vnops.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB378729DF458B000961B3 /* vnops.c */; };
+		CE7C9C9F29DFD33F00302FB1 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = CE7C9C9E29DFD33F00302FB1 /* main.c */; };
+		CE7C9CA429DFD4E800302FB1 /* ext2_args.h in Headers */ = {isa = PBXBuildFile; fileRef = CE7C9CA329DFD4E800302FB1 /* ext2_args.h */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		CE7C9C9A29DFD33E00302FB1 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		6ABB368E29DE909C000961B3 /* e2fsmac.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = e2fsmac.kext; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -48,10 +62,20 @@
 		6ABB36B629DF1B02000961B3 /* ext2fsP.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ext2fsP.h; sourceTree = "<group>"; };
 		6ABB378529DF38B7000961B3 /* vfsops.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = vfsops.c; sourceTree = "<group>"; };
 		6ABB378729DF458B000961B3 /* vnops.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = vnops.c; sourceTree = "<group>"; };
+		CE7C9C9C29DFD33E00302FB1 /* mount_ext2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = mount_ext2; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE7C9C9E29DFD33F00302FB1 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		CE7C9CA329DFD4E800302FB1 /* ext2_args.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ext2_args.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		6ABB368B29DE909C000961B3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE7C9C9929DFD33E00302FB1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -66,6 +90,7 @@
 			children = (
 				6ABB369929DE9597000961B3 /* libext2fs */,
 				6ABB369029DE909C000961B3 /* e2fsmac */,
+				CE7C9C9D29DFD33F00302FB1 /* mount_ext2 */,
 				6ABB368F29DE909C000961B3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -74,6 +99,7 @@
 			isa = PBXGroup;
 			children = (
 				6ABB368E29DE909C000961B3 /* e2fsmac.kext */,
+				CE7C9C9C29DFD33E00302FB1 /* mount_ext2 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -83,10 +109,11 @@
 			children = (
 				6ABB369129DE909C000961B3 /* init.c */,
 				6ABB36B229DE9A4C000961B3 /* e2fsmac.h */,
-				6ABB369329DE909C000961B3 /* Info.plist */,
 				6ABB36B429DF0EB2000961B3 /* malloc.c */,
 				6ABB378529DF38B7000961B3 /* vfsops.c */,
 				6ABB378729DF458B000961B3 /* vnops.c */,
+				6ABB369329DE909C000961B3 /* Info.plist */,
+				CE7C9CA329DFD4E800302FB1 /* ext2_args.h */,
 			);
 			path = e2fsmac;
 			sourceTree = "<group>";
@@ -111,6 +138,14 @@
 			path = libext2fs;
 			sourceTree = "<group>";
 		};
+		CE7C9C9D29DFD33F00302FB1 /* mount_ext2 */ = {
+			isa = PBXGroup;
+			children = (
+				CE7C9C9E29DFD33F00302FB1 /* main.c */,
+			);
+			path = mount_ext2;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -132,6 +167,7 @@
 				6ABB36AD29DE98D9000961B3 /* dirpaths.h in Headers */,
 				6ABB36A529DE9833000961B3 /* ext3_extents.h in Headers */,
 				6ABB36A429DE9833000961B3 /* ext2_ext_attr.h in Headers */,
+				CE7C9CA429DFD4E800302FB1 /* ext2_args.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -156,6 +192,23 @@
 			productReference = 6ABB368E29DE909C000961B3 /* e2fsmac.kext */;
 			productType = "com.apple.product-type.kernel-extension";
 		};
+		CE7C9C9B29DFD33E00302FB1 /* mount_ext2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE7C9CA029DFD33F00302FB1 /* Build configuration list for PBXNativeTarget "mount_ext2" */;
+			buildPhases = (
+				CE7C9C9829DFD33E00302FB1 /* Sources */,
+				CE7C9C9929DFD33E00302FB1 /* Frameworks */,
+				CE7C9C9A29DFD33E00302FB1 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = mount_ext2;
+			productName = mount_ext2;
+			productReference = CE7C9C9C29DFD33E00302FB1 /* mount_ext2 */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -167,6 +220,9 @@
 				TargetAttributes = {
 					6ABB368D29DE909C000961B3 = {
 						CreatedOnToolsVersion = 13.2.1;
+					};
+					CE7C9C9B29DFD33E00302FB1 = {
+						CreatedOnToolsVersion = 14.3;
 					};
 				};
 			};
@@ -184,6 +240,7 @@
 			projectRoot = "";
 			targets = (
 				6ABB368D29DE909C000961B3 /* e2fsmac */,
+				CE7C9C9B29DFD33E00302FB1 /* mount_ext2 */,
 			);
 		};
 /* End PBXProject section */
@@ -207,6 +264,14 @@
 				6ABB36B529DF0EB2000961B3 /* malloc.c in Sources */,
 				6ABB378829DF458B000961B3 /* vnops.c in Sources */,
 				6ABB378629DF38B7000961B3 /* vfsops.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE7C9C9829DFD33E00302FB1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE7C9C9F29DFD33F00302FB1 /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -328,9 +393,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z42A5SD27J;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = e2fsmac/Info.plist;
@@ -353,9 +419,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z42A5SD27J;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = e2fsmac/Info.plist;
@@ -371,6 +438,26 @@
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				WRAPPER_EXTENSION = kext;
+			};
+			name = Release;
+		};
+		CE7C9CA129DFD33F00302FB1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		CE7C9CA229DFD33F00302FB1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -391,6 +478,15 @@
 			buildConfigurations = (
 				6ABB369729DE909C000961B3 /* Debug */,
 				6ABB369829DE909C000961B3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CE7C9CA029DFD33F00302FB1 /* Build configuration list for PBXNativeTarget "mount_ext2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE7C9CA129DFD33F00302FB1 /* Debug */,
+				CE7C9CA229DFD33F00302FB1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

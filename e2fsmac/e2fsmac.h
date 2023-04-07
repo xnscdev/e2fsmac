@@ -23,6 +23,7 @@
 #include <libkern/locks.h>
 #include <sys/mount.h>
 #include <sys/vnode.h>
+#include "ext2_args.h"
 
 #define EXT2_VOLNAME_MAXLEN 16
 
@@ -37,7 +38,8 @@
 #define log_debug(fmt, ...) ((void) 0)
 #endif
 
-#define kassert(x) (x) ? (void) 0 : panic ("e2fsmac: assertion failed: " #x)
+#define kassert(x) (x) ? (void) 0 : panic ("e2fsmac: assertion failed: " #x \
+					   " at %s:%d", __func__, __LINE__)
 
 struct ext2_mount
 {
@@ -53,16 +55,6 @@ struct ext2_mount
   vnode_t rootvp;
   uid_t uid;
   gid_t gid;
-  uid_t resuid;
-  gid_t resgid;
-};
-
-struct ext2_args
-{
-#ifndef KERNEL
-  char *fspec;
-#endif
-  int magic;
   uid_t resuid;
   gid_t resgid;
 };

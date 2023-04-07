@@ -198,7 +198,7 @@ ext2_get_root_vnode (struct ext2_mount *emp, vnode_t *vp)
       else
 	{
 	  vn = emp->rootvp;
-	  kassert (!vn);
+	  kassert (vn);
 	  vid = vnode_vid (vn);
 	  lck_mtx_unlock (emp->mtx_root);
 
@@ -244,7 +244,7 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
       goto err0;
     }
 
-  if (args.magic != EXT2_SUPER_MAGIC)
+  if (args.magic != EXT2_ARGS_MAGIC)
     {
       err = EINVAL;
       log ("bad mount magic number: %#x", args.magic);
