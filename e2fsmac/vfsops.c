@@ -1,3 +1,4 @@
+
 /* Copyright (C) 2021-2023 Isaac Liu
 
    This program is free software: you can redistribute it and/or modify
@@ -16,6 +17,7 @@
 #include <sys/kauth.h>
 #include <sys/systm.h>
 #include "e2fsmac.h"
+#include "ext2fs.h"
 
 static int ext2_vfsop_unmount (struct mount *mp, int flags, vfs_context_t ctx);
 
@@ -303,8 +305,19 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
   st->f_fsid = emp->attr.f_fsid;
   st->f_owner = emp->attr.f_owner;
 
+  {
+    struct ext2_super_block super;
+    uio_t uio = uio_create (1, 1024, UIO_SYSSPACE, UIO_READ);
+    int ret = uio_addiov (uio, CAST_USER_ADDR_T (&super), sizeof super);
+    kassert (!ret);
+    ret = VNOP_READ (emp->devvp, uio, 0, ctx);
+    kassert (!ret);
+    log_debug ("magic number: %#x, resid: %#x", super.s_magic, uio_resid (uio));
+    uio_free (uio);
+  }
+
   vfs_setflags (mp, MNT_RDONLY | MNT_NOSUID | MNT_NODEV);
-  log ("mount successful on rdev %#x", emp->devid);
+  log ("mount: devid: %#x, emp: %p", emp->devid, emp);
   return 0;
 
  err0:
@@ -315,7 +328,7 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
 static int
 ext2_vfsop_start (struct mount *mp, int flags, vfs_context_t ctx)
 {
-  log_debug ("ext2 start: flags: %#x", flags);
+  log_debug ("start: flags: %#x", flags);
   return 0;
 }
 
@@ -353,6 +366,7 @@ ext2_vfsop_unmount (struct mount *mp, int flags, vfs_context_t ctx)
     lck_mtx_free (emp->mtx_root, ext2_lck_grp);
 
   emp->magic = 0;
+  log ("unmount: emp: %p", emp);
   kfree (emp);
 
  err0:
@@ -360,15 +374,16 @@ ext2_vfsop_unmount (struct mount *mp, int flags, vfs_context_t ctx)
 }
 
 static int
-ext2_vfsop_root (struct mount *mp, vnode_t *vp, vfs_context_t ctx)
+ext2_vfsop_root (struct mount *mp, vnode_t *vpp, vfs_context_t ctx)
 {
   errno_t err;
-  vnode_t vn = NULL;
+  vnode_t vp = NULL;
   struct ext2_mount *emp;
 
   emp = vfs_fsprivate (mp);
-  err = ext2_get_root_vnode (emp, &vn);
-  *vp = vn;
+  err = ext2_get_root_vnode (emp, &vp);
+  *vpp = vp;
+  log_debug ("root: vnode: %#x", vnode_vid (vp));
   return err;
 }
 
@@ -411,6 +426,7 @@ ext2_vfsop_getattr (struct mount *mp, struct vfs_attr *attr, vfs_context_t ctx)
       VFSATTR_SET_SUPPORTED (attr, f_uuid);
     }
 
+  log_debug ("getattr: emp: %p", emp);
   return 0;
 }
 

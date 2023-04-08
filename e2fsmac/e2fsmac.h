@@ -38,8 +38,8 @@
 #define log_debug(fmt, ...) ((void) 0)
 #endif
 
-#define kassert(x) (x) ? (void) 0 : panic ("e2fsmac: assertion failed: " #x \
-					   " at %s:%d", __func__, __LINE__)
+#define kassert(x) (x) ? (void) 0 : panic ("e2fsmac: assertion failed: %s" \
+					   " at %s:%d", #x, __func__, __LINE__)
 
 struct ext2_mount
 {

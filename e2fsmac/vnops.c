@@ -37,19 +37,6 @@ uiomove_atomic (void *addr, size_t size, uio_t uio)
 }
 
 static void
-ext2_assert_valid_vnode (vnode_t vp)
-{
-#ifdef DEBUG
-  struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vp));
-  int valid;
-  lck_mtx_lock (emp->mtx_root);
-  valid = vp == emp->rootvp;
-  lck_mtx_unlock (emp->mtx_root);
-  kassert (valid);
-#endif
-}
-
-static void
 ext2_detach_root_vnode (struct ext2_mount *emp, vnode_t vp)
 {
   int err;
@@ -90,6 +77,9 @@ static int ext2_vnop_lookup (struct vnop_lookup_args *args)
     err = ENOENT;
 
   *vpp = vp;
+  if (!err)
+    log_debug ("lookup: dvp: %#x, name: %s, vpp: %#x",
+	       vnode_vid (dvp), cnp->cn_nameptr, vnode_vid (vp));
   return err;
 }
 
@@ -97,7 +87,7 @@ static int
 ext2_vnop_open (struct vnop_open_args *args)
 {
   vnode_t vp = args->a_vp;
-  log_debug ("ext2 open: vnode %#x", vnode_vid (vp));
+  log_debug ("open: vnode: %#x", vnode_vid (vp));
   return 0;
 }
 
@@ -105,7 +95,7 @@ static int
 ext2_vnop_close (struct vnop_close_args *args)
 {
   vnode_t vp = args->a_vp;
-  log_debug ("ext2 close: vnode %#x", vnode_vid (vp));
+  log_debug ("close: vnode: %#x", vnode_vid (vp));
   return 0;
 }
 
@@ -127,6 +117,7 @@ ext2_vnop_getattr (struct vnop_getattr_args *args)
   VATTR_RETURN (vap, va_change_time, emp->attr.f_modify_time);
   VATTR_RETURN (vap, va_fileid, 2);
   VATTR_RETURN (vap, va_fsid, emp->devid);
+  log_debug ("getattr: vnode: %#x", vnode_vid (vp));
   return 0;
 }
 
@@ -138,6 +129,7 @@ ext2_vnop_readdir (struct vnop_readdir_args *args)
     | VNODE_READDIR_SEEKOFF32
     | VNODE_READDIR_NAMEMAX;
   int err = 0;
+  vnode_t vp = args->a_vp;
   struct uio *uio = args->a_uio;
   int flags = args->a_flags;
   int *eofflag = args->a_eofflag;
@@ -199,7 +191,8 @@ ext2_vnop_readdir (struct vnop_readdir_args *args)
   if (numdirent)
     *numdirent = num;
 
-  log_debug ("ext2 readdir: eofflag: %d, numdirent: %d", eof, num);
+  log_debug ("readdir: vnode: %#x, eofflag: %d, numdirent: %d",
+	     vnode_vid (vp), eof, num);
 
  err0:
   return err;
@@ -211,6 +204,7 @@ ext2_vnop_reclaim (struct vnop_reclaim_args *args)
   vnode_t vp = args->a_vp;
   struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vp));
   ext2_detach_root_vnode (emp, vp);
+  log_debug ("reclaim: vnode: %#x", vnode_vid (vp));
   return 0;
 }
 

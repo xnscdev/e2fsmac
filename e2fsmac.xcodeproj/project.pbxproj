@@ -14,6 +14,19 @@
 		6ABB378829DF458B000961B3 /* vnops.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB378729DF458B000961B3 /* vnops.c */; };
 		CE7C9C9F29DFD33F00302FB1 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = CE7C9C9E29DFD33F00302FB1 /* main.c */; };
 		CE7C9CA429DFD4E800302FB1 /* ext2_args.h in Headers */ = {isa = PBXBuildFile; fileRef = CE7C9CA329DFD4E800302FB1 /* ext2_args.h */; };
+		CEA453F329E1255300699A26 /* ext2_ext_attr.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA453E629E1255100699A26 /* ext2_ext_attr.h */; };
+		CEA453F429E1255300699A26 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA453E729E1255100699A26 /* config.h */; };
+		CEA453F529E1255300699A26 /* hashmap.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA453E829E1255100699A26 /* hashmap.h */; };
+		CEA453F629E1255300699A26 /* ext2_io.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA453E929E1255100699A26 /* ext2_io.h */; };
+		CEA453F729E1255300699A26 /* ext2_err.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA453EA29E1255200699A26 /* ext2_err.h */; };
+		CEA453F829E1255300699A26 /* ext2_types.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA453EB29E1255200699A26 /* ext2_types.h */; };
+		CEA453F929E1255300699A26 /* ext3_extents.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA453EC29E1255200699A26 /* ext3_extents.h */; };
+		CEA453FA29E1255300699A26 /* com_err.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA453ED29E1255200699A26 /* com_err.h */; };
+		CEA453FB29E1255300699A26 /* bitops.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA453EE29E1255200699A26 /* bitops.h */; };
+		CEA453FC29E1255300699A26 /* dirpaths.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA453EF29E1255200699A26 /* dirpaths.h */; };
+		CEA453FD29E1255300699A26 /* ext2_fs.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA453F029E1255300699A26 /* ext2_fs.h */; };
+		CEA453FE29E1255300699A26 /* ext2fsP.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA453F129E1255300699A26 /* ext2fsP.h */; };
+		CEA453FF29E1255300699A26 /* ext2fs.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA453F229E1255300699A26 /* ext2fs.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -39,6 +52,19 @@
 		CE7C9C9C29DFD33E00302FB1 /* mount_ext2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = mount_ext2; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE7C9C9E29DFD33F00302FB1 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		CE7C9CA329DFD4E800302FB1 /* ext2_args.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ext2_args.h; sourceTree = "<group>"; };
+		CEA453E629E1255100699A26 /* ext2_ext_attr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ext2_ext_attr.h; sourceTree = "<group>"; };
+		CEA453E729E1255100699A26 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		CEA453E829E1255100699A26 /* hashmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hashmap.h; sourceTree = "<group>"; };
+		CEA453E929E1255100699A26 /* ext2_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ext2_io.h; sourceTree = "<group>"; };
+		CEA453EA29E1255200699A26 /* ext2_err.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ext2_err.h; sourceTree = "<group>"; };
+		CEA453EB29E1255200699A26 /* ext2_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ext2_types.h; sourceTree = "<group>"; };
+		CEA453EC29E1255200699A26 /* ext3_extents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ext3_extents.h; sourceTree = "<group>"; };
+		CEA453ED29E1255200699A26 /* com_err.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = com_err.h; sourceTree = "<group>"; };
+		CEA453EE29E1255200699A26 /* bitops.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitops.h; sourceTree = "<group>"; };
+		CEA453EF29E1255200699A26 /* dirpaths.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dirpaths.h; sourceTree = "<group>"; };
+		CEA453F029E1255300699A26 /* ext2_fs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ext2_fs.h; sourceTree = "<group>"; };
+		CEA453F129E1255300699A26 /* ext2fsP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ext2fsP.h; sourceTree = "<group>"; };
+		CEA453F229E1255300699A26 /* ext2fs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ext2fs.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +88,7 @@
 		6ABB368429DE909B000961B3 = {
 			isa = PBXGroup;
 			children = (
+				CEA453E529E1250000699A26 /* libext2fs */,
 				6ABB369029DE909C000961B3 /* e2fsmac */,
 				CE7C9C9D29DFD33F00302FB1 /* mount_ext2 */,
 				6ABB368F29DE909C000961B3 /* Products */,
@@ -99,6 +126,26 @@
 			path = mount_ext2;
 			sourceTree = "<group>";
 		};
+		CEA453E529E1250000699A26 /* libext2fs */ = {
+			isa = PBXGroup;
+			children = (
+				CEA453EE29E1255200699A26 /* bitops.h */,
+				CEA453ED29E1255200699A26 /* com_err.h */,
+				CEA453E729E1255100699A26 /* config.h */,
+				CEA453EF29E1255200699A26 /* dirpaths.h */,
+				CEA453EA29E1255200699A26 /* ext2_err.h */,
+				CEA453E629E1255100699A26 /* ext2_ext_attr.h */,
+				CEA453F029E1255300699A26 /* ext2_fs.h */,
+				CEA453E929E1255100699A26 /* ext2_io.h */,
+				CEA453EB29E1255200699A26 /* ext2_types.h */,
+				CEA453F229E1255300699A26 /* ext2fs.h */,
+				CEA453F129E1255300699A26 /* ext2fsP.h */,
+				CEA453EC29E1255200699A26 /* ext3_extents.h */,
+				CEA453E829E1255100699A26 /* hashmap.h */,
+			);
+			path = libext2fs;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -106,8 +153,21 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CEA453FD29E1255300699A26 /* ext2_fs.h in Headers */,
+				CEA453F529E1255300699A26 /* hashmap.h in Headers */,
+				CEA453FF29E1255300699A26 /* ext2fs.h in Headers */,
+				CEA453F829E1255300699A26 /* ext2_types.h in Headers */,
+				CEA453F729E1255300699A26 /* ext2_err.h in Headers */,
+				CEA453F629E1255300699A26 /* ext2_io.h in Headers */,
+				CEA453FE29E1255300699A26 /* ext2fsP.h in Headers */,
+				CEA453F429E1255300699A26 /* config.h in Headers */,
 				6ABB36B329DE9A4C000961B3 /* e2fsmac.h in Headers */,
+				CEA453F929E1255300699A26 /* ext3_extents.h in Headers */,
+				CEA453FC29E1255300699A26 /* dirpaths.h in Headers */,
+				CEA453FB29E1255300699A26 /* bitops.h in Headers */,
 				CE7C9CA429DFD4E800302FB1 /* ext2_args.h in Headers */,
+				CEA453FA29E1255300699A26 /* com_err.h in Headers */,
+				CEA453F329E1255300699A26 /* ext2_ext_attr.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,7 +329,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.7;
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -322,7 +382,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.7;
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -341,7 +401,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = e2fsmac/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "GNU General Public License version 3.0 or later";
-				MACOSX_DEPLOYMENT_TARGET = 12.1;
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				MARKETING_VERSION = 1.0;
 				MODULE_NAME = com.github.xnscdev.e2fsmac;
 				MODULE_START = e2fsmac_start;
@@ -367,7 +427,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = e2fsmac/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "GNU General Public License version 3.0 or later";
-				MACOSX_DEPLOYMENT_TARGET = 12.1;
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				MARKETING_VERSION = 1.0;
 				MODULE_NAME = com.github.xnscdev.e2fsmac;
 				MODULE_START = e2fsmac_start;
@@ -411,7 +471,7 @@
 				6ABB369529DE909C000961B3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		6ABB369629DE909C000961B3 /* Build configuration list for PBXNativeTarget "e2fsmac" */ = {
 			isa = XCConfigurationList;
@@ -420,7 +480,7 @@
 				6ABB369829DE909C000961B3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		CE7C9CA029DFD33F00302FB1 /* Build configuration list for PBXNativeTarget "mount_ext2" */ = {
 			isa = XCConfigurationList;
@@ -429,7 +489,7 @@
 				CE7C9CA229DFD33F00302FB1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
