@@ -74,7 +74,8 @@ struct struct_io_stats {
 struct struct_io_manager {
 	errcode_t magic;
 	const char *name;
-	errcode_t (*open)(const char *name, int flags, io_channel *channel);
+	errcode_t (*open)(vnode_t vp, const char *name, int flags,
+			  io_channel *channel);
 	errcode_t (*close)(io_channel channel);
 	errcode_t (*set_blksize)(io_channel channel, int blksize);
 	errcode_t (*read_blk)(io_channel channel, unsigned long block,
@@ -142,16 +143,10 @@ extern errcode_t io_channel_cache_readahead(io_channel io,
 					    unsigned long long block,
 					    unsigned long long count);
 
-#ifdef _WIN32
-/* windows_io.c */
-extern io_manager windows_io_manager;
-#define default_io_manager windows_io_manager
-#else
-/* unix_io.c */
-extern io_manager unix_io_manager;
-extern io_manager unixfd_io_manager;
-#define default_io_manager unix_io_manager
-#endif
+/* Note: only this one is supported */
+/* xnu_io.c */
+extern io_manager xnu_io_manager;
+#define default_io_manager xnu_io_manager
 
 /* sparse_io.c */
 extern io_manager sparse_io_manager;

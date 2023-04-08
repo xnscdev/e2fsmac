@@ -305,17 +305,6 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
   st->f_fsid = emp->attr.f_fsid;
   st->f_owner = emp->attr.f_owner;
 
-  {
-    struct ext2_super_block super;
-    uio_t uio = uio_create (1, 1024, UIO_SYSSPACE, UIO_READ);
-    int ret = uio_addiov (uio, CAST_USER_ADDR_T (&super), sizeof super);
-    kassert (!ret);
-    ret = VNOP_READ (emp->devvp, uio, 0, ctx);
-    kassert (!ret);
-    log_debug ("magic number: %#x, resid: %#x", super.s_magic, uio_resid (uio));
-    uio_free (uio);
-  }
-
   vfs_setflags (mp, MNT_RDONLY | MNT_NOSUID | MNT_NODEV);
   log ("mount: devid: %#x, emp: %p", emp->devid, emp);
   return 0;

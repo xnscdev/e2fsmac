@@ -1690,10 +1690,10 @@ extern int ext2fs_default_journal_size(__u64 num_blocks);
 extern int ext2fs_journal_sb_start(int blocksize);
 
 /* openfs.c */
-extern errcode_t ext2fs_open(const char *name, int flags, int superblock,
+extern errcode_t ext2fs_open(vnode_t vp, int flags, int superblock,
                              unsigned int block_size, io_manager manager,
                              ext2_filsys *ret_fs);
-extern errcode_t ext2fs_open2(const char *name, const char *io_options,
+extern errcode_t ext2fs_open2(vnode_t vp, const char *io_options,
                               int flags, int superblock,
                               unsigned int block_size, io_manager manager,
                               ext2_filsys *ret_fs);
