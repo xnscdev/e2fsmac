@@ -16,30 +16,12 @@
 #ifndef __E2FSMAC_H
 #define __E2FSMAC_H
 
-#include <sys/types.h>
-#include <mach/mach_types.h>
-#include <sys/malloc.h>
-#include <libkern/libkern.h>
 #include <libkern/locks.h>
 #include <sys/mount.h>
-#include <sys/vnode.h>
 #include "ext2_args.h"
+#include "ext2fs.h"
 
 #define EXT2_VOLNAME_MAXLEN 16
-
-#define likely(x)               __builtin_expect (!!(x), 1)
-#define unlikely(x)             __builtin_expect (!!(x), 0)
-
-#define log(fmt, ...)           printf ("e2fsmac: " fmt "\n", ##__VA_ARGS__)
-#ifdef DEBUG
-#define log_debug(fmt, ...)						\
-  printf ("e2fsmac: " fmt " (%s:%d)\n", ##__VA_ARGS__, __func__, __LINE__)
-#else
-#define log_debug(fmt, ...) ((void) 0)
-#endif
-
-#define kassert(x) (x) ? (void) 0 : panic ("e2fsmac: assertion failed: %s" \
-					   " at %s:%d", #x, __func__, __LINE__)
 
 struct ext2_mount
 {
@@ -55,8 +37,7 @@ struct ext2_mount
   vnode_t rootvp;
   uid_t uid;
   gid_t gid;
-  uid_t resuid;
-  gid_t resgid;
+  ext2_filsys fs;
 };
 
 extern lck_grp_t *ext2_lck_grp;
@@ -64,17 +45,5 @@ extern lck_grp_t *ext2_lck_grp;
 extern struct vfsops ext2_vfsops;
 extern struct vnodeopv_desc *ext2_vnopv_desc_list[1];
 extern int (**ext2_vnop_p) (void *);
-
-void *kmalloc (size_t size, int flags);
-void *krealloc (void *ptr, size_t old, size_t new, int flags);
-void kfree (void *ptr);
-#ifdef DEBUG
-void kmemassert (void);
-#endif
-
-time_t get_time (void);
-
-ssize_t vpread (vnode_t vp, void *buffer, size_t len, off_t offset);
-ssize_t vpwrite (vnode_t vp, const void *buffer, size_t len, off_t offset);
 
 #endif

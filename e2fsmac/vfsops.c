@@ -128,10 +128,10 @@ static void ext2_init_attrs (struct ext2_mount *emp, vfs_context_t ctx)
 }
 
 static int
-ext2_get_root_vnode (struct ext2_mount *emp, vnode_t *vp)
+ext2_get_root_vnode (struct ext2_mount *emp, vnode_t *vpp)
 {
   errno_t err;
-  vnode_t vn = NULL;
+  vnode_t vp = NULL;
   uint32_t vid;
   struct vnode_fsparam param;
 
@@ -139,7 +139,7 @@ ext2_get_root_vnode (struct ext2_mount *emp, vnode_t *vp)
 
   do
     {
-      kassert (!vn);
+      kassert (!vp);
       lck_mtx_assert (emp->mtx_root, LCK_MTX_ASSERT_OWNED);
 
       if (emp->attach_root)
@@ -167,15 +167,15 @@ ext2_get_root_vnode (struct ext2_mount *emp, vnode_t *vp)
 	  param.vnfs_cnp = NULL;
 	  param.vnfs_flags = VNFS_NOCACHE | VNFS_CANTCACHE;
 
-	  err = vnode_create (VNCREATE_FLAVOR, sizeof param, &param, &vn);
+	  err = vnode_create (VNCREATE_FLAVOR, sizeof param, &param, &vp);
 	  if (!err)
 	    {
-	      kassert (vn);
-	      log_debug ("vnode_create() ok: vid %#x", vnode_vid (vn));
+	      kassert (vp);
+	      log_debug ("vnode_create() ok: vid %#x", vnode_vid (vp));
 	    }
 	  else
 	    {
-	      kassert (!vn);
+	      kassert (!vp);
 	      log ("vnode_create(): errno %d", err);
 	    }
 
@@ -184,8 +184,8 @@ ext2_get_root_vnode (struct ext2_mount *emp, vnode_t *vp)
 	    {
 	      errno_t err2;
 	      kassert (!emp->rootvp);
-	      emp->rootvp = vn;
-	      err2 = vnode_addfsref (vn);
+	      emp->rootvp = vp;
+	      err2 = vnode_addfsref (vp);
 	      kassert (!err2);
 	      kassert (emp->attach_root);
 	      emp->attach_root = 0;
@@ -198,16 +198,16 @@ ext2_get_root_vnode (struct ext2_mount *emp, vnode_t *vp)
 	}
       else
 	{
-	  vn = emp->rootvp;
-	  kassert (vn);
-	  vid = vnode_vid (vn);
+	  vp = emp->rootvp;
+	  kassert (vp);
+	  vid = vnode_vid (vp);
 	  lck_mtx_unlock (emp->mtx_root);
 
-	  err = vnode_getwithvid (vn, vid);
+	  err = vnode_getwithvid (vp, vid);
 	  if (err)
 	    {
 	      log ("vnode_getwithvid(): errno %d", err);
-	      vn = NULL;
+	      vp = NULL;
 	      err = EAGAIN;
 	    }
 
@@ -218,7 +218,7 @@ ext2_get_root_vnode (struct ext2_mount *emp, vnode_t *vp)
 
   lck_mtx_unlock (emp->mtx_root);
   if (!err)
-    *vp = vn;
+    *vpp = vp;
   return err;
 }
 
@@ -281,14 +281,19 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
 
   emp->magic = EXT2_ARGS_MAGIC;
   emp->mp = mp;
-  emp->resuid = args.resuid;
-  emp->resgid = args.resgid;
   strlcpy (emp->volname, "ext2", sizeof emp->volname);
 
   ext2_init_attrs (emp, ctx);
   kassert (!emp->attach_root);
   kassert (!emp->wait_root);
   kassert (!emp->rootvp);
+
+  err = ext2fs_open (emp->devvp, 0, 0, 0, default_io_manager, &emp->fs);
+  if (err)
+    {
+      log ("ext2fs_open(): errno %d", err);
+      goto err0;
+    }
 
   st = vfs_statfs (mp);
   kassert (st);
@@ -339,6 +344,14 @@ ext2_vfsop_unmount (struct mount *mp, int flags, vfs_context_t ctx)
   emp = vfs_fsprivate (mp);
   if (!emp)
     goto err0;
+
+  if (emp->fs)
+    {
+      err = ext2fs_close (emp->fs);
+      if (err)
+	goto err0;
+      emp->fs = NULL;
+    }
 
   if (emp->devvp)
     {

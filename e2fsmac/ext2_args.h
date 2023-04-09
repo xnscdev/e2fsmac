@@ -28,8 +28,6 @@ struct ext2_args
   char *fspec;
 #endif
   int magic;
-  uid_t resuid;
-  gid_t resgid;
 };
 
 #endif

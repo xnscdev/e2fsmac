@@ -13,7 +13,7 @@
    You should have received a copy of the GNU General Public License
    along with this program. If not, see <https://www.gnu.org/licenses/>. */
 
-#include "e2fsmac.h"
+#include "util.h"
 
 time_t
 get_time (void)

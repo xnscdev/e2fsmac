@@ -15,7 +15,8 @@
 
 /* Implement vnode I/O similar to POSIX */
 
-#include "e2fsmac.h"
+#include <sys/vnode.h>
+#include "util.h"
 
 ssize_t
 vpread (vnode_t vp, void *buffer, size_t len, off_t offset)

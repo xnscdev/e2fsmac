@@ -67,6 +67,12 @@
 		6AD426F029E26E140059B53A /* inline.c in Sources */ = {isa = PBXBuildFile; fileRef = 6AD426ED29E26E140059B53A /* inline.c */; };
 		6AD426F129E26E140059B53A /* valid_blk.c in Sources */ = {isa = PBXBuildFile; fileRef = 6AD426EE29E26E140059B53A /* valid_blk.c */; };
 		6AD426F229E26E140059B53A /* punch.c in Sources */ = {isa = PBXBuildFile; fileRef = 6AD426EF29E26E140059B53A /* punch.c */; };
+		6AD426F629E2929C0059B53A /* fallocate.c in Sources */ = {isa = PBXBuildFile; fileRef = 6AD426F329E2929C0059B53A /* fallocate.c */; };
+		6AD426F729E2929C0059B53A /* sha512.c in Sources */ = {isa = PBXBuildFile; fileRef = 6AD426F429E2929C0059B53A /* sha512.c */; };
+		6AD426F829E2929C0059B53A /* nls_utf8.c in Sources */ = {isa = PBXBuildFile; fileRef = 6AD426F529E2929C0059B53A /* nls_utf8.c */; };
+		6AD426FA29E292DA0059B53A /* utf8data.h in Headers */ = {isa = PBXBuildFile; fileRef = 6AD426F929E292DA0059B53A /* utf8data.h */; };
+		6AD426FC29E293C90059B53A /* qsort.c in Sources */ = {isa = PBXBuildFile; fileRef = 6AD426FB29E293C90059B53A /* qsort.c */; };
+		6AD426FE29E317CC0059B53A /* util.h in Headers */ = {isa = PBXBuildFile; fileRef = 6AD426FD29E317CC0059B53A /* util.h */; };
 		CE7C9C9F29DFD33F00302FB1 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = CE7C9C9E29DFD33F00302FB1 /* main.c */; };
 		CE7C9CA429DFD4E800302FB1 /* ext2_args.h in Headers */ = {isa = PBXBuildFile; fileRef = CE7C9CA329DFD4E800302FB1 /* ext2_args.h */; };
 		CEA453F329E1255300699A26 /* ext2_ext_attr.h in Headers */ = {isa = PBXBuildFile; fileRef = CEA453E629E1255100699A26 /* ext2_ext_attr.h */; };
@@ -158,6 +164,12 @@
 		6AD426ED29E26E140059B53A /* inline.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = inline.c; sourceTree = "<group>"; };
 		6AD426EE29E26E140059B53A /* valid_blk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = valid_blk.c; sourceTree = "<group>"; };
 		6AD426EF29E26E140059B53A /* punch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = punch.c; sourceTree = "<group>"; };
+		6AD426F329E2929C0059B53A /* fallocate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fallocate.c; sourceTree = "<group>"; };
+		6AD426F429E2929C0059B53A /* sha512.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sha512.c; sourceTree = "<group>"; };
+		6AD426F529E2929C0059B53A /* nls_utf8.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = nls_utf8.c; sourceTree = "<group>"; };
+		6AD426F929E292DA0059B53A /* utf8data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utf8data.h; sourceTree = "<group>"; };
+		6AD426FB29E293C90059B53A /* qsort.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = qsort.c; sourceTree = "<group>"; };
+		6AD426FD29E317CC0059B53A /* util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = util.h; sourceTree = "<group>"; };
 		CE7C9C9C29DFD33E00302FB1 /* mount_ext2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = mount_ext2; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE7C9C9E29DFD33F00302FB1 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		CE7C9CA329DFD4E800302FB1 /* ext2_args.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ext2_args.h; sourceTree = "<group>"; };
@@ -215,6 +227,7 @@
 		6ABB369029DE909C000961B3 /* e2fsmac */ = {
 			isa = PBXGroup;
 			children = (
+				6AD426FB29E293C90059B53A /* qsort.c */,
 				6ABB369329DE909C000961B3 /* Info.plist */,
 				6ABB369129DE909C000961B3 /* init.c */,
 				6ABB36B229DE9A4C000961B3 /* e2fsmac.h */,
@@ -224,6 +237,7 @@
 				CE7C9CA329DFD4E800302FB1 /* ext2_args.h */,
 				6AD4267929E1E7D20059B53A /* vio.c */,
 				6AD4269929E24AD30059B53A /* time.c */,
+				6AD426FD29E317CC0059B53A /* util.h */,
 			);
 			path = e2fsmac;
 			sourceTree = "<group>";
@@ -239,6 +253,10 @@
 		CEA453E529E1250000699A26 /* libext2fs */ = {
 			isa = PBXGroup;
 			children = (
+				6AD426F929E292DA0059B53A /* utf8data.h */,
+				6AD426F329E2929C0059B53A /* fallocate.c */,
+				6AD426F529E2929C0059B53A /* nls_utf8.c */,
+				6AD426F429E2929C0059B53A /* sha512.c */,
 				6AD426ED29E26E140059B53A /* inline.c */,
 				6AD426EF29E26E140059B53A /* punch.c */,
 				6AD426EE29E26E140059B53A /* valid_blk.c */,
@@ -321,6 +339,7 @@
 				CEA453FF29E1255300699A26 /* ext2fs.h in Headers */,
 				CEA453F829E1255300699A26 /* ext2_types.h in Headers */,
 				CEA453F729E1255300699A26 /* ext2_err.h in Headers */,
+				6AD426FE29E317CC0059B53A /* util.h in Headers */,
 				CEA453F629E1255300699A26 /* ext2_io.h in Headers */,
 				6AD426C829E25C3C0059B53A /* compiler.h in Headers */,
 				CEA453FE29E1255300699A26 /* ext2fsP.h in Headers */,
@@ -333,6 +352,7 @@
 				CEA453F929E1255300699A26 /* ext3_extents.h in Headers */,
 				CEA453FC29E1255300699A26 /* dirpaths.h in Headers */,
 				6AD4269629E23C900059B53A /* crc32c_table.h in Headers */,
+				6AD426FA29E292DA0059B53A /* utf8data.h in Headers */,
 				CEA453FB29E1255300699A26 /* bitops.h in Headers */,
 				6AD4269029E239C10059B53A /* crc16.h in Headers */,
 				CE7C9CA429DFD4E800302FB1 /* ext2_args.h in Headers */,
@@ -448,6 +468,7 @@
 				6AD426B529E252AE0059B53A /* gen_bitmap64.c in Sources */,
 				6AD4269A29E24AD30059B53A /* time.c in Sources */,
 				6AD4269E29E24B940059B53A /* read_bb.c in Sources */,
+				6AD426F629E2929C0059B53A /* fallocate.c in Sources */,
 				6AD426CC29E25D2A0059B53A /* bitops.c in Sources */,
 				6AD426BD29E25BA90059B53A /* gen_bitmap.c in Sources */,
 				6AD4268729E239770059B53A /* blknum.c in Sources */,
@@ -459,6 +480,7 @@
 				6AD426E829E26B520059B53A /* dirblock.c in Sources */,
 				6AD426B029E252560059B53A /* mmp.c in Sources */,
 				6AD426C029E25BA90059B53A /* blkmap64_rb.c in Sources */,
+				6AD426F729E2929C0059B53A /* sha512.c in Sources */,
 				6AD426A429E24C3E0059B53A /* extent.c in Sources */,
 				6AD426F129E26E140059B53A /* valid_blk.c in Sources */,
 				6AD4267C29E1ED120059B53A /* xnu_io.c in Sources */,
@@ -471,11 +493,13 @@
 				6AD426B429E252AE0059B53A /* rw_bitmaps.c in Sources */,
 				6AD426BE29E25BA90059B53A /* alloc_sb.c in Sources */,
 				6AD426EA29E26B520059B53A /* ext_attr.c in Sources */,
+				6AD426F829E2929C0059B53A /* nls_utf8.c in Sources */,
 				6AD4268829E239770059B53A /* hashmap.c in Sources */,
 				6AD4269329E23C630059B53A /* crc32c.c in Sources */,
 				6AD426E729E26B520059B53A /* get_num_dirs.c in Sources */,
 				6AD426C629E25C1B0059B53A /* symlink.c in Sources */,
 				6AD426C429E25C1B0059B53A /* rbtree.c in Sources */,
+				6AD426FC29E293C90059B53A /* qsort.c in Sources */,
 				6AD4269829E248F40059B53A /* inode.c in Sources */,
 				6AD426D929E263BB0059B53A /* ind_block.c in Sources */,
 				6AD426B629E252AE0059B53A /* bitmaps.c in Sources */,

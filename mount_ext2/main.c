@@ -23,8 +23,6 @@
 
 static struct option opts[] =
   {
-    {"resuid", required_argument, NULL, 'u'},
-    {"resgid", required_argument, NULL, 'g'},
     {"version", no_argument, NULL, 'v'},
     {"help", no_argument, NULL, 'h'}
   };
@@ -32,10 +30,8 @@ static struct option opts[] =
 static void
 usage (void)
 {
-  fprintf (stderr, "Usage: mount_ext2 [-ug] fspec mp\n"
+  fprintf (stderr, "Usage: mount_ext2 fspec mp\n"
 	   "       mount_ext2 -h\n"
-	   "  -u, --resuid        Override UID for reserved blocks/inodes\n"
-	   "  -g, --resgid        Override GID for reserved blocks/inodes\n"
 	   "  -h, --help          Print help\n"
 	   "  fspec               Special device to mount\n"
 	   "  mp                  Mount point\n");
@@ -45,24 +41,16 @@ int
 main (int argc, char **argv)
 {
   int ch;
-  uid_t resuid = 0;
-  uid_t resgid = 0;
   char *fspec;
   char *mp;
   char *realmp;
   struct ext2_args args;
   int err;
 
-  while ((ch = getopt_long (argc, argv, "ugh", opts, NULL)) != -1)
+  while ((ch = getopt_long (argc, argv, "h", opts, NULL)) != -1)
     {
       switch (ch)
 	{
-	case 'u':
-	  resuid = (uid_t) strtol (optarg, NULL, 0);
-	  break;
-	case 'g':
-	  resgid = (gid_t) strtol (optarg, NULL, 0);
-	  break;
 	case 'h':
 	  usage ();
 	  exit (0);
@@ -92,8 +80,6 @@ main (int argc, char **argv)
   args.fspec = fspec;
 #endif
   args.magic = EXT2_ARGS_MAGIC;
-  args.resuid = resuid;
-  args.resgid = resgid;
 
   err = mount ("ext2", realmp, 0, &args);
   free (realmp);

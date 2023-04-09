@@ -462,7 +462,7 @@ errcode_t ext2fs_new_range(ext2_filsys fs, int flags, blk64_t goal,
 		if (flags & EXT2_NEWRANGE_FIXED_GOAL && start != goal)
 			goto fail;
 
-		b = min(start + len - 1, max_blocks - 1);
+		b = MIN(start + len - 1, max_blocks - 1);
 		retval =  ext2fs_find_first_set_block_bitmap2(map, start, b,
 							      &end);
 		if (retval == ENOENT)

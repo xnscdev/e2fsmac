@@ -15,7 +15,7 @@
 
 #include <libkern/OSAtomic.h>
 #include <sys/systm.h>
-#include "e2fsmac.h"
+#include "util.h"
 
 #ifdef DEBUG
 static volatile SInt64 refcnt;

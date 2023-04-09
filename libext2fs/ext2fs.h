@@ -64,7 +64,7 @@ extern "C" {
 #include <sys/types.h>
 #endif
 
-#include "e2fsmac.h"
+#include "util.h"
 #include <string.h>
 
 #if EXT2_FLAT_INCLUDES
