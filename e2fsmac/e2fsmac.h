@@ -72,6 +72,8 @@ void kfree (void *ptr);
 void kmemassert (void);
 #endif
 
+time_t get_time (void);
+
 ssize_t vpread (vnode_t vp, void *buffer, size_t len, off_t offset);
 ssize_t vpwrite (vnode_t vp, const void *buffer, size_t len, off_t offset);
 

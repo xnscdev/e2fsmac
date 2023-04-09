@@ -2,6 +2,7 @@
 /* lib/config.h.in.  Generated from configure.ac by autoheader.  */
 
 #define EXT2_FLAT_INCLUDES 1
+#define OMIT_COM_ERR 1
 
 /* Define if building universal (internal helper macro) */
 /* #undef AC_APPLE_UNIVERSAL_BUILD */
@@ -19,10 +20,10 @@
 /* #undef CONFIG_JBD_DEBUG */
 
 /* Define to 1 to enable mmp support */
-#define CONFIG_MMP 1
+/* #undef CONFIG_MMP */
 
 /* Define to 1 to enable tdb support */
-#define CONFIG_TDB 1
+/* #undef CONFIG_TDB */
 
 /* Define to 1 if the testio I/O manager should be enabled */
 #define CONFIG_TESTIO_DEBUG 1
@@ -70,7 +71,7 @@
 #define HAVE_CFPREFERENCESCOPYAPPVALUE 1
 
 /* Define to 1 if you have the `chflags' function. */
-#define HAVE_CHFLAGS 1
+/* #undef HAVE_CHFLAGS */
 
 /* Define if the GNU dcgettext() function is already present or preinstalled.
    */
@@ -281,7 +282,7 @@
 /* #undef HAVE_POSIX_FADVISE64 */
 
 /* Define to 1 if you have the `posix_memalign' function. */
-#define HAVE_POSIX_MEMALIGN 1
+/* #undef HAVE_POSIX_MEMALIGN */
 
 /* Define to 1 if you have the `prctl' function. */
 /* #undef HAVE_PRCTL */
@@ -293,13 +294,13 @@
 /* #undef HAVE_PREAD64 */
 
 /* Define if you have POSIX threads libraries and header files. */
-#define HAVE_PTHREAD 1
+/* #undef HAVE_PTHREAD */
 
 /* Define to 1 if you have the <pthread.h> header file. */
-#define HAVE_PTHREAD_H 1
+/* #undef HAVE_PTHREAD_H */
 
 /* Have PTHREAD_PRIO_INHERIT. */
-#define HAVE_PTHREAD_PRIO_INHERIT 1
+/* #undef HAVE_PTHREAD_PRIO_INHERIT */
 
 /* Define to 1 if you have the `pwrite' function. */
 #define HAVE_PWRITE 1
@@ -488,7 +489,7 @@
 #define HAVE_UTIME_H 1
 
 /* Define to 1 if you have the `valloc' function. */
-#define HAVE_VALLOC 1
+/* #undef HAVE_VALLOC */
 
 /* Define to 1 if you have the `vprintf' function. */
 #define HAVE_VPRINTF 1

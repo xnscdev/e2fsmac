@@ -221,23 +221,7 @@ extern errcode_t ext2fs_find_first_set_generic_bmap(ext2fs_generic_bitmap bitmap
  */
 
 #if (defined(INCLUDE_INLINE_FUNCS) || !defined(NO_INLINE_FUNCS))
-#ifdef INCLUDE_INLINE_FUNCS
-#if (__STDC_VERSION__ >= 199901L)
-#define _INLINE_ extern inline
-#else
-#define _INLINE_ inline
-#endif
-#else /* !INCLUDE_INLINE FUNCS */
-#if (__STDC_VERSION__ >= 199901L)
-#define _INLINE_ inline
-#else /* not C99 */
-#ifdef __GNUC__
-#define _INLINE_ extern __inline__
-#else				/* For Watcom C */
-#define _INLINE_ extern inline
-#endif /* __GNUC__ */
-#endif /* __STDC_VERSION__ >= 199901L */
-#endif /* INCLUDE_INLINE_FUNCS */
+#define _INLINE_ static inline __attribute__ ((always_inline))
 
 /*
  * Fast bit set/clear functions that doesn't need to return the

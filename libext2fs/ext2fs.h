@@ -43,13 +43,6 @@ extern "C" {
 #endif
 
 /*
- * Non-GNU C compilers won't necessarily understand inline
- */
-#if (!defined(__GNUC__) && !defined(__WATCOMC__))
-#define NO_INLINE_FUNCS
-#endif
-
-/*
  * Where the master copy of the superblock is located, and how big
  * superblocks are supposed to be.  We define SUPERBLOCK_SIZE because
  * the size of the superblock structure is not necessarily trustworthy
@@ -94,12 +87,10 @@ typedef __s64 __bitwise        e2_blkcnt_t;
 typedef __u32 __bitwise        ext2_dirhash_t;
 
 #if EXT2_FLAT_INCLUDES
-#include "com_err.h"
 #include "ext2_io.h"
 #include "ext2_err.h"
 #include "ext2_ext_attr.h"
 #else
-#include <et/com_err.h>
 #include <ext2fs/ext2_io.h>
 #include <ext2fs/ext2_err.h>
 #include <ext2fs/ext2_ext_attr.h>
@@ -1869,19 +1860,7 @@ extern struct ext4_orphan_block_tail *ext2fs_orphan_block_tail(ext2_filsys fs,
  * functions at all!
  */
 #if (defined(INCLUDE_INLINE_FUNCS) || !defined(NO_INLINE_FUNCS))
-#ifdef INCLUDE_INLINE_FUNCS
-#define _INLINE_ extern
-#else
-#if (__STDC_VERSION__ >= 199901L)
-#define _INLINE_ inline
-#else
-#ifdef __GNUC__
-#define _INLINE_ extern __inline__
-#else                /* For Watcom C */
-#define _INLINE_ extern inline
-#endif /* __GNUC__ */
-#endif /* __STDC_VERSION__ >= 199901L */
-#endif
+#define _INLINE_ static inline __attribute__ ((always_inline))
 
 #ifndef EXT2_CUSTOM_MEMORY_ROUTINES
 #include <string.h>

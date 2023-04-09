@@ -2,6 +2,7 @@
 # define HASHMAP_H
 
 # include <stdint.h>
+# include <sys/types.h>
 
 #ifndef __GNUC_PREREQ
 #if defined(__GNUC__) && defined(__GNUC_MINOR__)
