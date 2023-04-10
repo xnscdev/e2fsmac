@@ -1,4 +1,3 @@
-
 /* Copyright (C) 2021-2023 Isaac Liu
 
    This program is free software: you can redistribute it and/or modify
@@ -21,7 +20,8 @@
 
 static int ext2_vfsop_unmount (struct mount *mp, int flags, vfs_context_t ctx);
 
-static void ext2_init_volattrs (struct ext2_mount *emp)
+static void
+ext2_init_volattrs (struct ext2_mount *emp)
 {
   vol_capabilities_attr_t *cap = &emp->attr.f_capabilities;
   vol_attributes_attr_t *attr = &emp->attr.f_attributes;
@@ -85,7 +85,8 @@ static void ext2_init_volattrs (struct ext2_mount *emp)
   bcopy (&attr->validattr, &attr->nativeattr, sizeof attr->validattr);
 }
 
-static void ext2_init_attrs (struct ext2_mount *emp, vfs_context_t ctx)
+static void
+ext2_init_attrs (struct ext2_mount *emp, vfs_context_t ctx)
 {
   kauth_cred_t cred;
   uid_t uid;
@@ -130,10 +131,9 @@ static void ext2_init_attrs (struct ext2_mount *emp, vfs_context_t ctx)
 static int
 ext2_get_root_vnode (struct ext2_mount *emp, vnode_t *vpp)
 {
-  errno_t err;
+  int ret;
   vnode_t vp = NULL;
   uint32_t vid;
-  struct vnode_fsparam param;
 
   lck_mtx_lock (emp->mtx_root);
 
@@ -147,28 +147,15 @@ ext2_get_root_vnode (struct ext2_mount *emp, vnode_t *vpp)
 	  emp->wait_root = 1;
 	  msleep (&emp->rootvp, emp->mtx_root, PINOD, NULL, NULL);
 	  kassert (!emp->wait_root);
-	  err = EAGAIN;
+	  ret = EAGAIN;
 	}
       else if (emp->rootvp == NULLVP)
 	{
 	  emp->attach_root = 1;
 	  lck_mtx_unlock (emp->mtx_root);
 
-	  param.vnfs_mp = emp->mp;
-	  param.vnfs_vtype = VDIR;
-	  param.vnfs_str = NULL;
-	  param.vnfs_dvp = NULL;
-	  param.vnfs_fsnode = NULL;
-	  param.vnfs_vops = ext2_vnop_p;
-	  param.vnfs_markroot = 1;
-	  param.vnfs_marksystem = 0;
-	  param.vnfs_rdev = 0;
-	  param.vnfs_filesize = 0;
-	  param.vnfs_cnp = NULL;
-	  param.vnfs_flags = VNFS_NOCACHE | VNFS_CANTCACHE;
-
-	  err = vnode_create (VNCREATE_FLAVOR, sizeof param, &param, &vp);
-	  if (!err)
+	  ret = ext2_create_vnode (emp, EXT2_ROOT_INO, NULL, &vp);
+	  if (!ret)
 	    {
 	      kassert (vp);
 	      log_debug ("vnode_create() ok: vid %#x", vnode_vid (vp));
@@ -176,17 +163,17 @@ ext2_get_root_vnode (struct ext2_mount *emp, vnode_t *vpp)
 	  else
 	    {
 	      kassert (!vp);
-	      log ("vnode_create(): errno %d", err);
+	      log ("ext2_create_vnode(): errno %d", ret);
 	    }
 
 	  lck_mtx_lock (emp->mtx_root);
-	  if (!err)
+	  if (!ret)
 	    {
-	      errno_t err2;
+	      int ret2;
 	      kassert (!emp->rootvp);
 	      emp->rootvp = vp;
-	      err2 = vnode_addfsref (vp);
-	      kassert (!err2);
+	      ret2 = vnode_addfsref (vp);
+	      kassert (!ret2);
 	      kassert (emp->attach_root);
 	      emp->attach_root = 0;
 	      if (emp->wait_root)
@@ -203,51 +190,51 @@ ext2_get_root_vnode (struct ext2_mount *emp, vnode_t *vpp)
 	  vid = vnode_vid (vp);
 	  lck_mtx_unlock (emp->mtx_root);
 
-	  err = vnode_getwithvid (vp, vid);
-	  if (err)
+	  ret = vnode_getwithvid (vp, vid);
+	  if (ret)
 	    {
-	      log ("vnode_getwithvid(): errno %d", err);
+	      log ("vnode_getwithvid(): errno %d", ret);
 	      vp = NULL;
-	      err = EAGAIN;
+	      ret = EAGAIN;
 	    }
 
 	  lck_mtx_lock (emp->mtx_root);
 	}
     }
-  while (err == EAGAIN);
+  while (ret == EAGAIN);
 
   lck_mtx_unlock (emp->mtx_root);
-  if (!err)
+  if (!ret)
     *vpp = vp;
-  return err;
+  return ret;
 }
 
 static int
 ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
 		  vfs_context_t ctx)
 {
-  errno_t err;
+  int ret;
   struct ext2_args args;
   struct ext2_mount *emp;
   struct vfsstatfs *st;
 
   if (vfs_isupdate (mp) || vfs_iswriteupgrade (mp))
     {
-      err = ENOTSUP;
+      ret = ENOTSUP;
       log ("update mounting is unsupported");
       goto err0;
     }
 
-  err = copyin (data, &args, sizeof args);
-  if (err)
+  ret = copyin (data, &args, sizeof args);
+  if (ret)
     {
-      log ("copyin(): errno %d", err);
+      log ("copyin(): errno %d", ret);
       goto err0;
     }
 
   if (args.magic != EXT2_ARGS_MAGIC)
     {
-      err = EINVAL;
+      ret = EINVAL;
       log ("bad mount magic number: %#x", args.magic);
       goto err0;
     }
@@ -255,17 +242,17 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
   emp = kmalloc (sizeof *emp, M_ZERO);
   if (unlikely (!emp))
     {
-      err = ENOMEM;
-      log ("kmalloc(): errno %d", err);
+      ret = ENOMEM;
+      log ("kmalloc(): errno %d", ret);
       goto err0;
     }
 
   vfs_setfsprivate (mp, emp);
 
-  err = vnode_ref (devvp);
-  if (err)
+  ret = vnode_ref (devvp);
+  if (ret)
     {
-      log ("vnode_ref(): errno %d", err);
+      log ("vnode_ref(): errno %d", ret);
       goto err0;
     }
   emp->devvp = devvp;
@@ -274,8 +261,8 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
   emp->mtx_root = lck_mtx_alloc_init (ext2_lck_grp, NULL);
   if (unlikely (!emp->mtx_root))
     {
-      err = ENOMEM;
-      log ("lck_mtx_alloc_init(): errno %d", err);
+      ret = ENOMEM;
+      log ("lck_mtx_alloc_init(): errno %d", ret);
       goto err0;
     }
 
@@ -288,10 +275,10 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
   kassert (!emp->wait_root);
   kassert (!emp->rootvp);
 
-  err = ext2fs_open (emp->devvp, 0, 0, 0, default_io_manager, &emp->fs);
-  if (err)
+  ret = ext2fs_open (emp->devvp, 0, 0, 0, default_io_manager, &emp->fs);
+  if (ret)
     {
-      log ("ext2fs_open(): errno %d", err);
+      log ("ext2fs_open(): errno %d", ret);
       goto err0;
     }
 
@@ -316,7 +303,7 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
 
  err0:
   kassert (!ext2_vfsop_unmount (mp, MNT_FORCE, ctx));
-  return err;
+  return ret;
 }
 
 static int
@@ -329,15 +316,15 @@ ext2_vfsop_start (struct mount *mp, int flags, vfs_context_t ctx)
 static int
 ext2_vfsop_unmount (struct mount *mp, int flags, vfs_context_t ctx)
 {
-  errno_t err;
+  int ret;
   int flush_flags;
   struct ext2_mount *emp;
 
   flush_flags = (flags & MNT_FORCE) ? FORCECLOSE : 0;
-  err = vflush (mp, NULL, flush_flags);
-  if (err)
+  ret = vflush (mp, NULL, flush_flags);
+  if (ret)
     {
-      log ("vflush(): errno %d", err);
+      log ("vflush(): errno %d", ret);
       goto err0;
     }
 
@@ -347,8 +334,8 @@ ext2_vfsop_unmount (struct mount *mp, int flags, vfs_context_t ctx)
 
   if (emp->fs)
     {
-      err = ext2fs_close (emp->fs);
-      if (err)
+      ret = ext2fs_close (emp->fs);
+      if (ret)
 	goto err0;
       emp->fs = NULL;
     }
@@ -372,21 +359,22 @@ ext2_vfsop_unmount (struct mount *mp, int flags, vfs_context_t ctx)
   kfree (emp);
 
  err0:
-  return err;
+  return ret;
 }
 
 static int
 ext2_vfsop_root (struct mount *mp, vnode_t *vpp, vfs_context_t ctx)
 {
-  errno_t err;
+  int ret;
   vnode_t vp = NULL;
   struct ext2_mount *emp;
 
   emp = vfs_fsprivate (mp);
-  err = ext2_get_root_vnode (emp, &vp);
+  ret = ext2_get_root_vnode (emp, &vp);
   *vpp = vp;
-  log_debug ("root: vnode: %#x", vnode_vid (vp));
-  return err;
+  if (!ret)
+    log_debug ("root: vnode: %#x", vnode_vid (vp));
+  return ret;
 }
 
 static int

@@ -40,10 +40,21 @@ struct ext2_mount
   ext2_filsys fs;
 };
 
+struct ext2_fsnode
+{
+  ext2_file_t file;
+  ext2_ino_t ino;
+  struct ext2_inode *inode;
+};
+
 extern lck_grp_t *ext2_lck_grp;
 
 extern struct vfsops ext2_vfsops;
 extern struct vnodeopv_desc *ext2_vnopv_desc_list[1];
 extern int (**ext2_vnop_p) (void *);
+
+int ext2_create_vnode (struct ext2_mount *emp, ext2_ino_t ino, vnode_t dvp,
+		       vnode_t *vpp);
+int ext2_open_vnode (struct ext2_mount *emp, vnode_t vp, int flags);
 
 #endif

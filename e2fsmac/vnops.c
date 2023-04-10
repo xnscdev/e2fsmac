@@ -53,12 +53,14 @@ ext2_detach_root_vnode (struct ext2_mount *emp, vnode_t vp)
   lck_mtx_unlock (emp->mtx_root);
 }
 
-static int ext2_vnop_default (struct vnop_generic_args *args)
+static int
+ext2_vnop_default (struct vnop_generic_args *args)
 {
   return ENOTSUP;
 }
 
-static int ext2_vnop_lookup (struct vnop_lookup_args *args)
+static int
+ext2_vnop_lookup (struct vnop_lookup_args *args)
 {
   errno_t err;
   vnode_t dvp = args->a_dvp;
@@ -87,7 +89,22 @@ static int
 ext2_vnop_open (struct vnop_open_args *args)
 {
   vnode_t vp = args->a_vp;
-  log_debug ("open: vnode: %#x", vnode_vid (vp));
+  int mode = args->a_mode;
+  struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vp));
+  struct ext2_fsnode *fsnode = vnode_fsnode (vp);
+  int ret;
+
+  if (!fsnode->file)
+    {
+      ret = ext2_open_vnode (emp, vp, (mode & FWRITE) ? EXT2_FILE_WRITE : 0);
+      if (ret)
+	{
+	  log_debug ("open failed: vnode: %#x, errno: %d\n",
+		     vnode_vid (vp), ret);
+	  return ret;
+	}
+    }
+  log_debug ("open: vnode: %#x, fsnode: %p", vnode_vid (vp), vnode_fsnode (vp));
   return 0;
 }
 
@@ -95,6 +112,18 @@ static int
 ext2_vnop_close (struct vnop_close_args *args)
 {
   vnode_t vp = args->a_vp;
+  struct ext2_fsnode *fsnode = vnode_fsnode (vp);
+
+  if (fsnode)
+    {
+      if (fsnode->file)
+	{
+	  log_debug ("close: freeing ext2_file_t: %p", fsnode->file);
+	  ext2fs_file_close (fsnode->file);
+	  fsnode->file = NULL;
+	}
+      vnode_clearfsnode (vp);
+    }
   log_debug ("close: vnode: %#x", vnode_vid (vp));
   return 0;
 }
@@ -104,18 +133,22 @@ ext2_vnop_getattr (struct vnop_getattr_args *args)
 {
   vnode_t vp = args->a_vp;
   struct vnode_attr *vap = args->a_vap;
+  struct ext2_fsnode *fsnode = vnode_fsnode (vp);
   struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vp));
+  struct timespec create_time = { fsnode->inode->i_ctime, 0 };
+  struct timespec access_time = { fsnode->inode->i_atime, 0 };
+  struct timespec modify_time = { fsnode->inode->i_mtime, 0 };
 
   VATTR_RETURN (vap, va_rdev, 0);
-  VATTR_RETURN (vap, va_nlink, 2);
-  VATTR_RETURN (vap, va_data_size, sizeof (struct dirent) << 1);
-  VATTR_RETURN (vap, va_mode, S_IFDIR | S_IRUSR | S_IXUSR | S_IRGRP | S_IXGRP
-		| S_IROTH | S_IXOTH);
-  VATTR_RETURN (vap, va_create_time, emp->attr.f_create_time);
-  VATTR_RETURN (vap, va_access_time, emp->attr.f_access_time);
-  VATTR_RETURN (vap, va_modify_time, emp->attr.f_modify_time);
-  VATTR_RETURN (vap, va_change_time, emp->attr.f_modify_time);
-  VATTR_RETURN (vap, va_fileid, 2);
+  VATTR_RETURN (vap, va_nlink, fsnode->inode->i_links_count);
+  VATTR_RETURN (vap, va_data_size, ext2fs_file_get_size (fsnode->file));
+  /* The S_IFMT constants are same on XNU and Linux, can use direct value */
+  VATTR_RETURN (vap, va_mode, fsnode->inode->i_mode);
+  VATTR_RETURN (vap, va_create_time, create_time);
+  VATTR_RETURN (vap, va_access_time, access_time);
+  VATTR_RETURN (vap, va_modify_time, modify_time);
+  VATTR_RETURN (vap, va_change_time, modify_time);
+  VATTR_RETURN (vap, va_fileid, ext2fs_file_get_inode_num (fsnode->file));
   VATTR_RETURN (vap, va_fsid, emp->devid);
   log_debug ("getattr: vnode: %#x", vnode_vid (vp));
   return 0;

@@ -12,6 +12,7 @@
 		6ABB36B529DF0EB2000961B3 /* malloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB36B429DF0EB2000961B3 /* malloc.c */; };
 		6ABB378629DF38B7000961B3 /* vfsops.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB378529DF38B7000961B3 /* vfsops.c */; };
 		6ABB378829DF458B000961B3 /* vnops.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB378729DF458B000961B3 /* vnops.c */; };
+		6ACB08D429E34284001E12CA /* inode.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ACB08D329E34284001E12CA /* inode.c */; };
 		6AD4267A29E1E7D20059B53A /* vio.c in Sources */ = {isa = PBXBuildFile; fileRef = 6AD4267929E1E7D20059B53A /* vio.c */; };
 		6AD4267C29E1ED120059B53A /* xnu_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 6AD4267B29E1ED120059B53A /* xnu_io.c */; };
 		6AD4267E29E229EB0059B53A /* openfs.c in Sources */ = {isa = PBXBuildFile; fileRef = 6AD4267D29E229EB0059B53A /* openfs.c */; };
@@ -109,6 +110,7 @@
 		6ABB36B429DF0EB2000961B3 /* malloc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = malloc.c; sourceTree = "<group>"; };
 		6ABB378529DF38B7000961B3 /* vfsops.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = vfsops.c; sourceTree = "<group>"; };
 		6ABB378729DF458B000961B3 /* vnops.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = vnops.c; sourceTree = "<group>"; };
+		6ACB08D329E34284001E12CA /* inode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = inode.c; sourceTree = "<group>"; };
 		6AD4267929E1E7D20059B53A /* vio.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = vio.c; sourceTree = "<group>"; };
 		6AD4267B29E1ED120059B53A /* xnu_io.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = xnu_io.c; sourceTree = "<group>"; };
 		6AD4267D29E229EB0059B53A /* openfs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = openfs.c; sourceTree = "<group>"; };
@@ -227,6 +229,7 @@
 		6ABB369029DE909C000961B3 /* e2fsmac */ = {
 			isa = PBXGroup;
 			children = (
+				6ACB08D329E34284001E12CA /* inode.c */,
 				6AD426FB29E293C90059B53A /* qsort.c */,
 				6ABB369329DE909C000961B3 /* Info.plist */,
 				6ABB369129DE909C000961B3 /* init.c */,
@@ -504,6 +507,7 @@
 				6AD426D929E263BB0059B53A /* ind_block.c in Sources */,
 				6AD426B629E252AE0059B53A /* bitmaps.c in Sources */,
 				6AD426A829E24C3E0059B53A /* block.c in Sources */,
+				6ACB08D429E34284001E12CA /* inode.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
