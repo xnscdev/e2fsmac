@@ -151,6 +151,7 @@ ext2_get_root_vnode (struct ext2_mount *emp, vnode_t *vpp)
 	}
       else if (emp->rootvp == NULLVP)
 	{
+	  struct ext2_fsnode *fsnode;
 	  emp->attach_root = 1;
 	  lck_mtx_unlock (emp->mtx_root);
 
@@ -158,12 +159,28 @@ ext2_get_root_vnode (struct ext2_mount *emp, vnode_t *vpp)
 	  if (!ret)
 	    {
 	      kassert (vp);
-	      log_debug ("vnode_create() ok: vid %#x", vnode_vid (vp));
+	      log_debug ("ext2_create_vnode() ok: vid %#x", vnode_vid (vp));
 	    }
 	  else
 	    {
 	      kassert (!vp);
-	      log ("ext2_create_vnode(): errno %d", ret);
+	      log ("ext2_create_vnode(): vid %#x, errno %d",
+		   vnode_vid (vp), ret);
+	      return ret;
+	    }
+
+	  fsnode = vnode_fsnode (vp);
+	  kassert (fsnode);
+	  if (!fsnode->file)
+	    {
+	      ret = ext2_open_vnode (emp, vp, 0);
+	      if (!ret)
+		log_debug ("ext2_open_vnode() ok");
+	      else
+		{
+		  log ("ext2_open_vnode(): errno %d", ret);
+		  return ret;
+		}
 	    }
 
 	  lck_mtx_lock (emp->mtx_root);
