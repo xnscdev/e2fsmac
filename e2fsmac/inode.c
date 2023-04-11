@@ -25,6 +25,7 @@ ext2_create_vnode (struct ext2_mount *emp, ext2_ino_t ino, vnode_t dvp,
   struct ext2_inode *inode;
   struct ext2_fsnode *fsnode;
   enum vtype vmode;
+  vnode_t vp = NULL;
   int ret;
 
   ret = ext2fs_file_open (emp->fs, ino, 0, &file);
@@ -73,7 +74,11 @@ ext2_create_vnode (struct ext2_mount *emp, ext2_ino_t ino, vnode_t dvp,
   param.vnfs_filesize = ext2fs_file_get_size (file);
   param.vnfs_cnp = NULL;
   param.vnfs_flags = VNFS_NOCACHE | VNFS_CANTCACHE;
-  ret = vnode_create (VNCREATE_FLAVOR, sizeof param, &param, vpp);
+  ret = vnode_create (VNCREATE_FLAVOR, sizeof param, &param, &vp);
+  if (!ret)
+    log_debug ("created vnode %#x for ino %lld, fsnode %p",
+	       vnode_vid (vp), ino, vnode_fsnode (vp));
+  *vpp = vp;
 
  err0:
   ext2fs_file_close (file);
@@ -90,5 +95,6 @@ ext2_open_vnode (struct ext2_mount *emp, vnode_t vp, int flags)
   if (ret)
     return ret;
   fsnode->inode = ext2fs_file_get_inode (fsnode->file);
+  log_debug ("opened vnode %#x, fsnode %p", vnode_vid (vp), vnode_fsnode (vp));
   return 0;
 }

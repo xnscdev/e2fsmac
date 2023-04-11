@@ -57,7 +57,8 @@ ext2_init_volattrs (struct ext2_mount *emp)
   attr->validattr.dirattr = 0;
 
   attr->validattr.fileattr =
-    ATTR_FILE_TOTALSIZE
+    ATTR_FILE_LINKCOUNT
+    | ATTR_FILE_TOTALSIZE
     | ATTR_FILE_IOBLOCKSIZE
     | ATTR_FILE_DATALENGTH
     | ATTR_FILE_DATAALLOCSIZE;
@@ -315,7 +316,7 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
   st->f_owner = emp->attr.f_owner;
 
   vfs_setflags (mp, MNT_RDONLY | MNT_NOSUID | MNT_NODEV);
-  log ("mount: devid: %#x, emp: %p", emp->devid, emp);
+  log ("mount: devid: %#x", emp->devid);
   return 0;
 
  err0:
@@ -432,7 +433,6 @@ ext2_vfsop_getattr (struct mount *mp, struct vfs_attr *attr, vfs_context_t ctx)
       bcopy (emp->attr.f_uuid, attr->f_uuid, sizeof attr->f_uuid);
       VFSATTR_SET_SUPPORTED (attr, f_uuid);
     }
-
   log_debug ("getattr: emp: %p", emp);
   return 0;
 }

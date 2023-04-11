@@ -22,32 +22,32 @@ int (**ext2_vnop_p) (void *);
 static int
 uiomove_atomic (void *addr, size_t size, uio_t uio)
 {
-  int err;
+  int ret;
   if (unlikely (size > INT_MAX))
-    err = ERANGE;
+    ret = ERANGE;
   else if (unlikely (size > (user_size_t) uio_resid (uio)))
-    err = ENOBUFS;
+    ret = ENOBUFS;
   else
-    err = uiomove (addr, (int) size, uio);
+    ret = uiomove (addr, (int) size, uio);
 
-  if (err)
+  if (ret)
     log ("uiomove_atomic(): size: %zu, resid: %lld, errno: %d",
-	 size, uio_resid (uio), err);
-  return err;
+	 size, uio_resid (uio), ret);
+  return ret;
 }
 
 static void
 ext2_detach_root_vnode (struct ext2_mount *emp, vnode_t vp)
 {
-  int err;
+  int ret;
   lck_mtx_lock (emp->mtx_root);
   if (emp->attach_root)
     kassert (!emp->rootvp);
   if (emp->rootvp)
     {
       kassert (emp->rootvp == vp);
-      err = vnode_removefsref (emp->rootvp);
-      kassert (!err);
+      ret = vnode_removefsref (emp->rootvp);
+      kassert (!ret);
       emp->rootvp = NULL;
     }
   lck_mtx_unlock (emp->mtx_root);
@@ -62,27 +62,37 @@ ext2_vnop_default (struct vnop_generic_args *args)
 static int
 ext2_vnop_lookup (struct vnop_lookup_args *args)
 {
-  errno_t err;
+  int ret;
   vnode_t dvp = args->a_dvp;
   vnode_t *vpp = args->a_vpp;
   struct componentname *cnp = args->a_cnp;
   vnode_t vp = NULL;
   kassert (vnode_isdir (dvp));
 
-  if ((cnp->cn_flags & ISDOTDOT) || !strcmp (cnp->cn_nameptr, "."))
+  if (!strcmp (cnp->cn_nameptr, ".")
+      || ((cnp->cn_flags & ISDOTDOT) && vnode_isvroot (dvp)))
     {
-      err = vnode_get (dvp);
-      if (!err)
+      ret = vnode_get (dvp);
+      if (!ret)
 	vp = dvp;
     }
+  else if (cnp->cn_flags & ISDOTDOT)
+    {
+      vp = vnode_getparent (dvp);
+      if (!vp)
+	ret = ENOENT;
+    }
   else
-    err = ENOENT;
+    {
+      log_debug ("lookup: bad cnp: %s", cnp->cn_nameptr);
+      ret = ENOENT;
+    }
 
   *vpp = vp;
-  if (!err)
+  if (!ret)
     log_debug ("lookup: dvp: %#x, name: %s, vpp: %#x",
 	       vnode_vid (dvp), cnp->cn_nameptr, vnode_vid (vp));
-  return err;
+  return ret;
 }
 
 static int
@@ -90,21 +100,10 @@ ext2_vnop_open (struct vnop_open_args *args)
 {
   vnode_t vp = args->a_vp;
   int mode = args->a_mode;
-  struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vp));
-  struct ext2_fsnode *fsnode = vnode_fsnode (vp);
-  int ret;
-
-  if (!fsnode->file)
-    {
-      ret = ext2_open_vnode (emp, vp, (mode & FWRITE) ? EXT2_FILE_WRITE : 0);
-      if (ret)
-	{
-	  log_debug ("open failed: vnode: %#x, errno: %d\n",
-		     vnode_vid (vp), ret);
-	  return ret;
-	}
-    }
-  log_debug ("open: vnode: %#x, fsnode: %p", vnode_vid (vp), vnode_fsnode (vp));
+  log_debug ("open: vnode: %#x, fsnode: %p, mode:%s%s", vnode_vid (vp),
+	     vnode_fsnode (vp),
+	     (mode & FREAD) ? " FREAD" : "",
+	     (mode & FWRITE) ? " FWRITE" : "");
   return 0;
 }
 
@@ -112,18 +111,6 @@ static int
 ext2_vnop_close (struct vnop_close_args *args)
 {
   vnode_t vp = args->a_vp;
-  struct ext2_fsnode *fsnode = vnode_fsnode (vp);
-
-  if (fsnode)
-    {
-      if (fsnode->file)
-	{
-	  log_debug ("close: freeing ext2_file_t: %p", fsnode->file);
-	  ext2fs_file_close (fsnode->file);
-	  fsnode->file = NULL;
-	}
-      vnode_clearfsnode (vp);
-    }
   log_debug ("close: vnode: %#x", vnode_vid (vp));
   return 0;
 }
@@ -142,13 +129,15 @@ ext2_vnop_getattr (struct vnop_getattr_args *args)
   VATTR_RETURN (vap, va_rdev, 0);
   VATTR_RETURN (vap, va_nlink, fsnode->inode->i_links_count);
   VATTR_RETURN (vap, va_data_size, ext2fs_file_get_size (fsnode->file));
-  /* The S_IFMT constants are same on XNU and Linux, can use direct value */
   VATTR_RETURN (vap, va_mode, fsnode->inode->i_mode);
+  VATTR_RETURN (vap, va_uid, fsnode->inode->i_uid);
+  VATTR_RETURN (vap, va_gid, fsnode->inode->i_gid);
   VATTR_RETURN (vap, va_create_time, create_time);
   VATTR_RETURN (vap, va_access_time, access_time);
   VATTR_RETURN (vap, va_modify_time, modify_time);
   VATTR_RETURN (vap, va_change_time, modify_time);
-  VATTR_RETURN (vap, va_fileid, ext2fs_file_get_inode_num (fsnode->file));
+  VATTR_RETURN (vap, va_iosize, emp->fs->blocksize);
+  VATTR_RETURN (vap, va_fileid, fsnode->ino);
   VATTR_RETURN (vap, va_fsid, emp->devid);
   log_debug ("getattr: vnode: %#x", vnode_vid (vp));
   return 0;
@@ -236,7 +225,22 @@ ext2_vnop_reclaim (struct vnop_reclaim_args *args)
 {
   vnode_t vp = args->a_vp;
   struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vp));
-  ext2_detach_root_vnode (emp, vp);
+  struct ext2_fsnode *fsnode = vnode_fsnode (vp);
+
+  if (fsnode)
+    {
+      if (fsnode->file)
+	{
+	  log_debug ("close: freeing ext2_file_t: %p", fsnode->file);
+	  ext2fs_file_close (fsnode->file);
+	  fsnode->file = NULL;
+	}
+      vnode_clearfsnode (vp);
+    }
+
+  if (vnode_isvroot (vp))
+    ext2_detach_root_vnode (emp, vp);
+
   log_debug ("reclaim: vnode: %#x", vnode_vid (vp));
   return 0;
 }
