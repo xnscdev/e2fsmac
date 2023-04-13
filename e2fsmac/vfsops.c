@@ -345,9 +345,16 @@ static int
 ext2_vfsop_getattr (struct mount *mp, struct vfs_attr *attr, vfs_context_t ctx)
 {
   struct ext2_mount *emp = vfs_fsprivate (mp);
-  struct timespec ts = { .tv_sec = 1234567890, .tv_nsec = 0 };
+  struct ext2_super_block *super = emp->fs->super;
+  struct timespec create_time = { 0, 0 };
+  struct timespec modify_time = { 0, 0 };
+  struct timespec access_time = { 0, 0 };
   fsid_t fsid;
   uuid_t uuid;
+  blk64_t blocks_cnt;
+  blk64_t free_cnt;
+  blk64_t res_cnt;
+  blk64_t avail_cnt;
 
   ext2_init_volattrs (attr);
 
@@ -356,25 +363,42 @@ ext2_vfsop_getattr (struct mount *mp, struct vfs_attr *attr, vfs_context_t ctx)
 
   uuid_generate_random (uuid);
 
-  VFSATTR_RETURN (attr, f_bsize, 4096);
-  VFSATTR_RETURN (attr, f_iosize, 4096);
-  VFSATTR_RETURN (attr, f_blocks, 1);
-  VFSATTR_RETURN (attr, f_bfree, 0);
-  VFSATTR_RETURN (attr, f_bavail, 0);
-  VFSATTR_RETURN (attr, f_bused, 1);
-  VFSATTR_RETURN (attr, f_files, 1);
-  VFSATTR_RETURN (attr, f_ffree, 0);
+  blocks_cnt = ext2fs_blocks_count (super);
+  free_cnt = ext2fs_free_blocks_count (super);
+  res_cnt = ext2fs_r_blocks_count (super);
+  avail_cnt = free_cnt >= res_cnt ? free_cnt - res_cnt : 0;
+
+  if (super->s_rev_level == EXT2_DYNAMIC_REV)
+    {
+      create_time.tv_sec = super->s_mkfs_time;
+      VFSATTR_RETURN (attr, f_create_time, create_time);
+    }
+  modify_time.tv_sec = super->s_wtime;
+  access_time.tv_sec = super->s_mtime;
+
+  VFSATTR_RETURN (attr, f_bsize, emp->fs->blocksize);
+  VFSATTR_RETURN (attr, f_iosize, emp->fs->blocksize);
+  VFSATTR_RETURN (attr, f_blocks, blocks_cnt);
+  VFSATTR_RETURN (attr, f_bfree, free_cnt);
+  VFSATTR_RETURN (attr, f_bavail, avail_cnt);
+  VFSATTR_RETURN (attr, f_bused, blocks_cnt - free_cnt);
+  VFSATTR_RETURN (attr, f_files, super->s_inodes_count);
+  VFSATTR_RETURN (attr, f_ffree, super->s_free_inodes_count);
   VFSATTR_RETURN (attr, f_fsid, fsid);
   VFSATTR_RETURN (attr, f_owner, emp->uid);
-  VFSATTR_RETURN (attr, f_create_time, ts);
-  VFSATTR_RETURN (attr, f_modify_time, ts);
-  VFSATTR_RETURN (attr, f_access_time, ts);
+  VFSATTR_RETURN (attr, f_modify_time, modify_time);
+  VFSATTR_RETURN (attr, f_access_time, access_time);
   VFSATTR_RETURN (attr, f_fssubtype, 0);
-  VFSATTR_RETURN (attr, f_vol_name, "VOLUME NAME");
+
+  if (VFSATTR_IS_ACTIVE (attr, f_vol_name))
+    {
+      strncpy (attr->f_vol_name, (char *) super->s_volume_name, EXT2_LABEL_LEN);
+      VFSATTR_SET_SUPPORTED (attr, f_vol_name);
+    }
 
   if (VFSATTR_IS_ACTIVE (attr, f_uuid))
     {
-      memcpy (attr->f_uuid, uuid, sizeof attr->f_uuid);
+      memcpy (attr->f_uuid, super->s_uuid, sizeof attr->f_uuid);
       VFSATTR_SET_SUPPORTED (attr, f_uuid);
     }
   log_debug ("getattr: emp: %p", emp);
