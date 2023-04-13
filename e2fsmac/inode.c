@@ -53,11 +53,11 @@ ext2_create_vnode (struct ext2_mount *emp, ext2_ino_t ino, vnode_t dvp,
       goto err0;
     }
 
-  fsnode = kmalloc (sizeof *fsnode, M_ZERO);
+  fsnode = e2fsmac_malloc (sizeof *fsnode, M_ZERO);
   if (unlikely (!fsnode))
     {
       ret = ENOMEM;
-      log_debug ("kmalloc(): errno %d", ret);
+      log_debug ("e2fsmac_malloc(): errno %d", ret);
       goto err0;
     }
   fsnode->ino = ino;

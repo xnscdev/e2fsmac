@@ -94,7 +94,7 @@ errcode_t ext2fs_open(vnode_t vp, int flags, int superblock,
 
 static void block_sha_map_free_entry(void *data)
 {
-	kfree(data);
+	e2fsmac_free(data);
 	return;
 }
 

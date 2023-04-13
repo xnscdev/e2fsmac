@@ -1871,7 +1871,7 @@ _INLINE_ errcode_t ext2fs_get_mem(unsigned long size, void *ptr)
 {
     void *pp;
     
-    pp = kmalloc(size, 0);
+    pp = e2fsmac_malloc(size, 0);
     if (!pp)
         return EXT2_ET_NO_MEMORY;
     memcpy(ptr, &pp, sizeof (pp));
@@ -1882,7 +1882,7 @@ _INLINE_ errcode_t ext2fs_get_memzero(unsigned long size, void *ptr)
 {
     void *pp;
     
-    pp = kmalloc(size, M_ZERO);
+    pp = e2fsmac_malloc(size, M_ZERO);
     if (!pp)
         return EXT2_ET_NO_MEMORY;
     memset(pp, 0, size);
@@ -1915,7 +1915,7 @@ _INLINE_ errcode_t ext2fs_free_mem(void *ptr)
     void *p;
     
     memcpy(&p, ptr, sizeof(p));
-    kfree(p);
+    e2fsmac_free(p);
     p = 0;
     memcpy(ptr, &p, sizeof(p));
     return 0;
@@ -1932,7 +1932,7 @@ _INLINE_ errcode_t ext2fs_resize_mem(unsigned long old_size,
     /* Use "memcpy" for pointer assignments here to avoid problems
      * with C99 strict type aliasing rules. */
     memcpy(&p, ptr, sizeof(p));
-    p = krealloc(p, old_size, size, 0);
+    p = e2fsmac_realloc(p, old_size, size, 0);
     if (!p)
         return EXT2_ET_NO_MEMORY;
     memcpy(ptr, &p, sizeof(p));

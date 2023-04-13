@@ -257,11 +257,11 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
       goto err0;
     }
 
-  emp = kmalloc (sizeof *emp, M_ZERO);
+  emp = e2fsmac_malloc (sizeof *emp, M_ZERO);
   if (unlikely (!emp))
     {
       ret = ENOMEM;
-      log ("kmalloc(): errno %d", ret);
+      log ("e2fsmac_malloc(): errno %d", ret);
       goto err0;
     }
 
@@ -374,7 +374,7 @@ ext2_vfsop_unmount (struct mount *mp, int flags, vfs_context_t ctx)
 
   emp->magic = 0;
   log ("unmount: emp: %p", emp);
-  kfree (emp);
+  e2fsmac_free (emp);
 
  err0:
   return ret;

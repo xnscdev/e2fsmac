@@ -35,7 +35,7 @@ struct ext2fs_hashmap *ext2fs_hashmap_create(
 				uint32_t(*hash_fct)(const void*, size_t),
 				void(*free_fct)(void*), size_t size)
 {
-	struct ext2fs_hashmap *h = kmalloc(sizeof(struct ext2fs_hashmap) +
+	struct ext2fs_hashmap *h = e2fsmac_malloc(sizeof(struct ext2fs_hashmap) +
 				sizeof(struct ext2fs_hashmap_entry) * size, M_ZERO);
 	if (!h)
 		return NULL;
@@ -51,7 +51,7 @@ int ext2fs_hashmap_add(struct ext2fs_hashmap *h,
 		       void *data, const void *key, size_t key_len)
 {
 	uint32_t hash = h->hash(key, key_len) % h->size;
-	struct ext2fs_hashmap_entry *e = kmalloc(sizeof(*e), 0);
+	struct ext2fs_hashmap_entry *e = e2fsmac_malloc(sizeof(*e), 0);
 
 	if (!e)
 		return -1;
@@ -102,9 +102,9 @@ void ext2fs_hashmap_free(struct ext2fs_hashmap *h)
 			struct ext2fs_hashmap_entry *tmp = it->next;
 			if (h->free)
 				h->free(it->data);
-			kfree(it);
+			e2fsmac_free(it);
 			it = tmp;
 		}
 	}
-	kfree(h);
+	e2fsmac_free(h);
 }

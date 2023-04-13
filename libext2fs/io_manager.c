@@ -32,7 +32,7 @@ errcode_t io_channel_set_options(io_channel channel, const char *opts)
 	if (!channel->manager->set_option)
 		return EXT2_ET_INVALID_ARGUMENT;
 
-	options = kmalloc(strlen(opts)+1, 0);
+	options = e2fsmac_malloc(strlen(opts)+1, 0);
 	if (!options)
 		return EXT2_ET_NO_MEMORY;
 	strlcpy(options, opts, strlen(opts)+1);
@@ -52,7 +52,7 @@ errcode_t io_channel_set_options(io_channel channel, const char *opts)
 			break;
 		ptr = next;
 	}
-	kfree(options);
+	e2fsmac_free(options);
 	return retval;
 }
 

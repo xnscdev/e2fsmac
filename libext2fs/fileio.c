@@ -436,7 +436,7 @@ errcode_t ext2fs_file_write(ext2_file_t file, const void *buf,
 		if (!file->physblock) {
 			bmap_flags = (file->ino ? BMAP_ALLOC : 0);
 			if (fs->flags & EXT2_FLAG_SHARE_DUP) {
-				new_block = kmalloc(sizeof(*new_block), M_ZERO);
+				new_block = e2fsmac_malloc(sizeof(*new_block), M_ZERO);
 				if (!new_block) {
 					retval = EXT2_ET_NO_MEMORY;
 					goto fail;
@@ -452,7 +452,7 @@ errcode_t ext2fs_file_write(ext2_file_t file, const void *buf,
 			if (old_block) {
 				file->physblock = old_block->physblock;
 				bmap_flags |= BMAP_SET;
-				kfree(new_block);
+				e2fsmac_free(new_block);
 				new_block = NULL;
 			}
 
@@ -462,7 +462,7 @@ errcode_t ext2fs_file_write(ext2_file_t file, const void *buf,
 					      file->blockno, 0,
 					      &file->physblock);
 			if (retval) {
-				kfree(new_block);
+				e2fsmac_free(new_block);
 				new_block = NULL;
 				goto fail;
 			}
@@ -474,7 +474,7 @@ errcode_t ext2fs_file_write(ext2_file_t file, const void *buf,
 						sizeof(new_block->sha));
 				if (ret) {
 					retval = EXT2_ET_NO_MEMORY;
-					kfree(new_block);
+					e2fsmac_free(new_block);
 					goto fail;
 				}
 			}

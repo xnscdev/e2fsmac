@@ -1027,7 +1027,7 @@ static errcode_t extent_node_split(ext2_extent_handle_t handle,
 	}
 
 	/* first we need a new block, or can do nothing. */
-	block_buf = kmalloc(handle->fs->blocksize, 0);
+	block_buf = e2fsmac_malloc(handle->fs->blocksize, 0);
 	if (!block_buf) {
 		retval = ENOMEM;
 		goto done;
@@ -1147,7 +1147,7 @@ static errcode_t extent_node_split(ext2_extent_handle_t handle,
 done:
 	if (newpath)
 		ext2fs_free_mem(&newpath);
-	kfree(block_buf);
+	e2fsmac_free(block_buf);
 
 	return retval;
 }

@@ -68,9 +68,9 @@ errcode_t ext2fs_get_memalign(unsigned long size,
 		*p = valloc(size);
 	else
 #endif
-		*p = kmalloc(size, 0);
+		*p = e2fsmac_malloc(size, 0);
 	if ((uintptr_t) *p & (align - 1)) {
-		kfree(*p);
+		e2fsmac_free(*p);
 		*p = 0;
 	}
 	if (*p == 0)

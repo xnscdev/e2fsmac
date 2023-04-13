@@ -57,7 +57,7 @@ errcode_t ext2fs_zero_blocks2(ext2_filsys fs, blk64_t blk, int num,
 	/* If fs is null, clean up the static buffer and return */
 	if (!fs) {
 		if (buf) {
-			kfree(buf);
+			e2fsmac_free(buf);
 			buf = 0;
 			stride_length = 0;
 		}
@@ -80,7 +80,7 @@ errcode_t ext2fs_zero_blocks2(ext2_filsys fs, blk64_t blk, int num,
 
 		if (new_stride > MAX_STRIDE_LENGTH)
 			new_stride = MAX_STRIDE_LENGTH;
-		p = krealloc(buf, fs->blocksize * stride_length, fs->blocksize * new_stride, 0);
+		p = e2fsmac_realloc(buf, fs->blocksize * stride_length, fs->blocksize * new_stride, 0);
 		if (!p)
 			return EXT2_ET_NO_MEMORY;
 		buf = p;

@@ -36,9 +36,9 @@
 #define kassert(x) (x) ? (void) 0 : panic ("e2fsmac: assertion failed: %s" \
 					   " at %s:%d", #x, __func__, __LINE__)
 
-void *kmalloc (size_t size, int flags);
-void *krealloc (void *ptr, size_t old, size_t new, int flags);
-void kfree (void *ptr);
+void *e2fsmac_malloc (size_t size, int flags);
+void *e2fsmac_realloc (void *ptr, size_t old, size_t new, int flags);
+void e2fsmac_free (void *ptr);
 #ifdef DEBUG
 void kmemassert (void);
 #endif

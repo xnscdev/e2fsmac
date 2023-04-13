@@ -22,7 +22,7 @@ static volatile SInt64 refcnt;
 #endif
 
 void *
-kmalloc (size_t size, int flags)
+e2fsmac_malloc (size_t size, int flags)
 {
   void *addr = _MALLOC (size, M_TEMP, flags);
 #ifdef DEBUG
@@ -33,23 +33,23 @@ kmalloc (size_t size, int flags)
 }
 
 void *
-krealloc (void *ptr, size_t old, size_t new, int flags)
+e2fsmac_realloc (void *ptr, size_t old, size_t new, int flags)
 {
   void *addr;
   if (old == new)
     return ptr;
   if (!ptr)
-    return kmalloc (new, flags);
+    return e2fsmac_malloc (new, flags);
   addr = _MALLOC (new, M_TEMP, flags);
   if (unlikely (!addr))
     return NULL;
   memcpy (addr, ptr, MIN (old, new));
-  kfree (ptr);
+  e2fsmac_free (ptr);
   return addr;
 }
 
 void
-kfree (void *ptr)
+e2fsmac_free (void *ptr)
 {
 #ifdef DEBUG
   if (ptr)

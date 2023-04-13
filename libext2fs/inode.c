@@ -1054,7 +1054,7 @@ errcode_t ext2fs_write_new_inode(ext2_filsys fs, ext2_ino_t ino,
 		return ext2fs_write_inode_full(fs, ino, inode,
 					       sizeof(struct ext2_inode));
 
-	buf = kmalloc(size, 0);
+	buf = e2fsmac_malloc(size, 0);
 	if (!buf)
 		return ENOMEM;
 
@@ -1068,7 +1068,7 @@ errcode_t ext2fs_write_new_inode(ext2_filsys fs, ext2_ino_t ino,
 		large_inode->i_crtime = t;
 
 	retval = ext2fs_write_inode_full(fs, ino, buf, size);
-	kfree(buf);
+	e2fsmac_free(buf);
 	return retval;
 }
 
