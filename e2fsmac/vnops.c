@@ -100,11 +100,29 @@ ext2_vnop_open (struct vnop_open_args *args)
 {
   vnode_t vp = args->a_vp;
   int mode = args->a_mode;
+  struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vp));
+  struct ext2_fsnode *fsnode = vnode_fsnode (vp);
+  int flags = (mode & FWRITE) ? EXT2_FILE_WRITE : 0;
+  int ret = 0;
+
+  kassert (fsnode);
+  if (fsnode->file && fsnode->flags != flags)
+    {
+      log_debug ("open: freeing ext2_file_t in wrong mode: %p", fsnode->file);
+      ext2fs_file_close (fsnode->file);
+      fsnode->file = NULL;
+    }
+  if (!fsnode->file)
+    {
+      ret = ext2_open_vnode (emp, vp, flags);
+      if (ret)
+	log_debug ("ext2_open_vnode(): errno %d", ret);
+    }
   log_debug ("open: vnode: %#x, fsnode: %p, mode:%s%s", vnode_vid (vp),
 	     vnode_fsnode (vp),
 	     (mode & FREAD) ? " FREAD" : "",
 	     (mode & FWRITE) ? " FWRITE" : "");
-  return 0;
+  return ret;
 }
 
 static int

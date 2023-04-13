@@ -43,6 +43,7 @@ struct ext2_fsnode
   ext2_file_t file;
   ext2_ino_t ino;
   struct ext2_inode *inode;
+  int flags;
 };
 
 extern lck_grp_t *ext2_lck_grp;

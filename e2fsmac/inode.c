@@ -95,6 +95,7 @@ ext2_open_vnode (struct ext2_mount *emp, vnode_t vp, int flags)
   if (ret)
     return ret;
   fsnode->inode = ext2fs_file_get_inode (fsnode->file);
+  fsnode->flags = flags;
   log_debug ("opened vnode %#x, fsnode %p", vnode_vid (vp), vnode_fsnode (vp));
   return 0;
 }
