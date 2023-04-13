@@ -21,10 +21,10 @@
 static int ext2_vfsop_unmount (struct mount *mp, int flags, vfs_context_t ctx);
 
 static void
-ext2_init_volattrs (struct ext2_mount *emp)
+ext2_init_volattrs (struct vfs_attr *vfs_attr)
 {
-  vol_capabilities_attr_t *cap = &emp->attr.f_capabilities;
-  vol_attributes_attr_t *attr = &emp->attr.f_attributes;
+  vol_capabilities_attr_t *cap = &vfs_attr->f_capabilities;
+  vol_attributes_attr_t *attr = &vfs_attr->f_attributes;
   cap->capabilities[VOL_CAPABILITIES_FORMAT] =
     VOL_CAP_FMT_NO_ROOT_TIMES
     | VOL_CAP_FMT_CASE_SENSITIVE
@@ -71,10 +71,6 @@ ext2_init_volattrs (struct ext2_mount *emp)
     | ATTR_VOL_SPACEFREE
     | ATTR_VOL_SPACEAVAIL
     | ATTR_VOL_IOBLOCKSIZE
-    | ATTR_VOL_OBJCOUNT
-    | ATTR_VOL_FILECOUNT
-    | ATTR_VOL_DIRCOUNT
-    | ATTR_VOL_MAXOBJCOUNT
     | ATTR_VOL_MOUNTPOINT
     | ATTR_VOL_NAME
     | ATTR_VOL_MOUNTFLAGS
@@ -84,49 +80,6 @@ ext2_init_volattrs (struct ext2_mount *emp)
     | ATTR_VOL_ATTRIBUTES;
 
   bcopy (&attr->validattr, &attr->nativeattr, sizeof attr->validattr);
-}
-
-static void
-ext2_init_attrs (struct ext2_mount *emp, vfs_context_t ctx)
-{
-  kauth_cred_t cred;
-  uid_t uid;
-  gid_t gid;
-  struct timespec ts;
-
-  cred = vfs_context_ucred (ctx);
-  kassert (cred);
-  uid = kauth_cred_getuid (cred);
-  gid = kauth_cred_getgid (cred);
-  emp->uid = uid;
-  emp->gid = gid;
-
-  emp->attr.f_objcount = 1;
-  emp->attr.f_filecount = 0;
-  emp->attr.f_dircount = 1;
-  emp->attr.f_maxobjcount = 1;
-  emp->attr.f_bsize = 4096;
-  emp->attr.f_iosize = 4096;
-  emp->attr.f_blocks = 1;
-  emp->attr.f_bfree = 0;
-  emp->attr.f_bavail = 0;
-  emp->attr.f_bused = 1;
-  emp->attr.f_files = 1;
-  emp->attr.f_ffree = 0;
-  emp->attr.f_fsid.val[0] = emp->devid;
-  emp->attr.f_fsid.val[1] = vfs_typenum (emp->mp);
-  emp->attr.f_owner = uid;
-
-  ext2_init_volattrs (emp);
-  nanotime (&ts);
-  bcopy (&ts, &emp->attr.f_create_time, sizeof ts);
-  bcopy (&ts, &emp->attr.f_modify_time, sizeof ts);
-  bcopy (&ts, &emp->attr.f_access_time, sizeof ts);
-
-  emp->attr.f_fssubtype = 0;
-  emp->attr.f_vol_name = emp->volname;
-
-  uuid_generate_random (emp->attr.f_uuid);
 }
 
 static int
@@ -235,6 +188,7 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
   struct ext2_args args;
   struct ext2_mount *emp;
   struct vfsstatfs *st;
+  kauth_cred_t cred;
 
   if (vfs_isupdate (mp) || vfs_iswriteupgrade (mp))
     {
@@ -286,9 +240,7 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
 
   emp->magic = EXT2_ARGS_MAGIC;
   emp->mp = mp;
-  strlcpy (emp->volname, "ext2", sizeof emp->volname);
 
-  ext2_init_attrs (emp, ctx);
   kassert (!emp->attach_root);
   kassert (!emp->wait_root);
   kassert (!emp->rootvp);
@@ -304,16 +256,10 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
   kassert (st);
   kassert (!strcmp (st->f_fstypename, "ext2"));
 
-  st->f_bsize = emp->attr.f_bsize;
-  st->f_iosize = emp->attr.f_iosize;
-  st->f_blocks = emp->attr.f_blocks;
-  st->f_bfree = emp->attr.f_bfree;
-  st->f_bavail = emp->attr.f_bavail;
-  st->f_bused = emp->attr.f_bused;
-  st->f_files = emp->attr.f_files;
-  st->f_ffree = emp->attr.f_ffree;
-  st->f_fsid = emp->attr.f_fsid;
-  st->f_owner = emp->attr.f_owner;
+  cred = vfs_context_ucred (ctx);
+  kassert (cred);
+  emp->uid = kauth_cred_getuid (cred);
+  emp->gid = kauth_cred_getgid (cred);
 
   vfs_setflags (mp, MNT_RDONLY | MNT_NOSUID | MNT_NODEV);
   log ("mount: devid: %#x", emp->devid);
@@ -399,38 +345,36 @@ static int
 ext2_vfsop_getattr (struct mount *mp, struct vfs_attr *attr, vfs_context_t ctx)
 {
   struct ext2_mount *emp = vfs_fsprivate (mp);
-  VFSATTR_RETURN (attr, f_objcount, emp->attr.f_objcount);
-  VFSATTR_RETURN (attr, f_filecount, emp->attr.f_filecount);
-  VFSATTR_RETURN (attr, f_dircount, emp->attr.f_dircount);
-  VFSATTR_RETURN (attr, f_maxobjcount, emp->attr.f_maxobjcount);
-  VFSATTR_RETURN (attr, f_bsize, emp->attr.f_bsize);
-  VFSATTR_RETURN (attr, f_iosize, emp->attr.f_iosize);
-  VFSATTR_RETURN (attr, f_blocks, emp->attr.f_blocks);
-  VFSATTR_RETURN (attr, f_bfree, emp->attr.f_bfree);
-  VFSATTR_RETURN (attr, f_bavail, emp->attr.f_bavail);
-  VFSATTR_RETURN (attr, f_bused, emp->attr.f_bused);
-  VFSATTR_RETURN (attr, f_files, emp->attr.f_files);
-  VFSATTR_RETURN (attr, f_ffree, emp->attr.f_ffree);
-  VFSATTR_RETURN (attr, f_fsid, emp->attr.f_fsid);
-  VFSATTR_RETURN (attr, f_owner, emp->attr.f_owner);
-  VFSATTR_RETURN (attr, f_capabilities, emp->attr.f_capabilities);
-  VFSATTR_RETURN (attr, f_attributes, emp->attr.f_attributes);
-  VFSATTR_RETURN (attr, f_create_time, emp->attr.f_create_time);
-  VFSATTR_RETURN (attr, f_modify_time, emp->attr.f_modify_time);
-  VFSATTR_RETURN (attr, f_access_time, emp->attr.f_access_time);
-  VFSATTR_RETURN (attr, f_fssubtype, emp->attr.f_fssubtype);
+  struct timespec ts = { .tv_sec = 1234567890, .tv_nsec = 0 };
+  fsid_t fsid;
+  uuid_t uuid;
 
-  if (VFSATTR_IS_ACTIVE (attr, f_vol_name))
-    {
-      strncpy (attr->f_vol_name, emp->attr.f_vol_name, EXT2_VOLNAME_MAXLEN);
-      attr->f_vol_name[EXT2_VOLNAME_MAXLEN - 1] = '\0';
-      VFSATTR_SET_SUPPORTED (attr, f_vol_name);
-    }
+  ext2_init_volattrs (attr);
+
+  fsid.val[0] = emp->devid;
+  fsid.val[1] = vfs_typenum (emp->mp);
+
+  uuid_generate_random (uuid);
+
+  VFSATTR_RETURN (attr, f_bsize, 4096);
+  VFSATTR_RETURN (attr, f_iosize, 4096);
+  VFSATTR_RETURN (attr, f_blocks, 1);
+  VFSATTR_RETURN (attr, f_bfree, 0);
+  VFSATTR_RETURN (attr, f_bavail, 0);
+  VFSATTR_RETURN (attr, f_bused, 1);
+  VFSATTR_RETURN (attr, f_files, 1);
+  VFSATTR_RETURN (attr, f_ffree, 0);
+  VFSATTR_RETURN (attr, f_fsid, fsid);
+  VFSATTR_RETURN (attr, f_owner, emp->uid);
+  VFSATTR_RETURN (attr, f_create_time, ts);
+  VFSATTR_RETURN (attr, f_modify_time, ts);
+  VFSATTR_RETURN (attr, f_access_time, ts);
+  VFSATTR_RETURN (attr, f_fssubtype, 0);
+  VFSATTR_RETURN (attr, f_vol_name, "VOLUME NAME");
 
   if (VFSATTR_IS_ACTIVE (attr, f_uuid))
     {
-      kassert (sizeof emp->attr.f_uuid == sizeof attr->f_uuid);
-      bcopy (emp->attr.f_uuid, attr->f_uuid, sizeof attr->f_uuid);
+      memcpy (attr->f_uuid, uuid, sizeof attr->f_uuid);
       VFSATTR_SET_SUPPORTED (attr, f_uuid);
     }
   log_debug ("getattr: emp: %p", emp);

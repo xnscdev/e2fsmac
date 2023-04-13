@@ -29,8 +29,6 @@ struct ext2_mount
   mount_t mp;
   dev_t devid;
   vnode_t devvp;
-  char volname[EXT2_VOLNAME_MAXLEN];
-  struct vfs_attr attr;
   lck_mtx_t *mtx_root;
   unsigned char attach_root;
   unsigned char wait_root;

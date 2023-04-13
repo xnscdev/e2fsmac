@@ -62,7 +62,7 @@ ext2_vnop_default (struct vnop_generic_args *args)
 static int
 ext2_vnop_lookup (struct vnop_lookup_args *args)
 {
-  int ret;
+  int ret = 0;
   vnode_t dvp = args->a_dvp;
   vnode_t *vpp = args->a_vpp;
   struct componentname *cnp = args->a_cnp;

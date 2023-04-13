@@ -76,7 +76,7 @@ ext2_create_vnode (struct ext2_mount *emp, ext2_ino_t ino, vnode_t dvp,
   param.vnfs_flags = VNFS_NOCACHE | VNFS_CANTCACHE;
   ret = vnode_create (VNCREATE_FLAVOR, sizeof param, &param, &vp);
   if (!ret)
-    log_debug ("created vnode %#x for ino %lld, fsnode %p",
+    log_debug ("created vnode %#x for ino %u, fsnode %p",
 	       vnode_vid (vp), ino, vnode_fsnode (vp));
   *vpp = vp;
 
