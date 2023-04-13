@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6AB795C029E8AF950069F348 /* namei.c in Sources */ = {isa = PBXBuildFile; fileRef = 6AB795BF29E8AF950069F348 /* namei.c */; };
 		6ABB369229DE909C000961B3 /* init.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB369129DE909C000961B3 /* init.c */; };
 		6ABB36B329DE9A4C000961B3 /* e2fsmac.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36B229DE9A4C000961B3 /* e2fsmac.h */; };
 		6ABB36B529DF0EB2000961B3 /* malloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB36B429DF0EB2000961B3 /* malloc.c */; };
@@ -103,6 +104,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6AB795BF29E8AF950069F348 /* namei.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = namei.c; sourceTree = "<group>"; };
 		6ABB368E29DE909C000961B3 /* e2fsmac.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = e2fsmac.kext; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ABB369129DE909C000961B3 /* init.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = init.c; sourceTree = "<group>"; };
 		6ABB369329DE909C000961B3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -256,6 +258,7 @@
 		CEA453E529E1250000699A26 /* libext2fs */ = {
 			isa = PBXGroup;
 			children = (
+				6AB795BF29E8AF950069F348 /* namei.c */,
 				6AD426F929E292DA0059B53A /* utf8data.h */,
 				6AD426F329E2929C0059B53A /* fallocate.c */,
 				6AD426F529E2929C0059B53A /* nls_utf8.c */,
@@ -470,6 +473,7 @@
 				6AD426CE29E25D2A0059B53A /* alloc_stats.c in Sources */,
 				6AD426B529E252AE0059B53A /* gen_bitmap64.c in Sources */,
 				6AD4269A29E24AD30059B53A /* time.c in Sources */,
+				6AB795C029E8AF950069F348 /* namei.c in Sources */,
 				6AD4269E29E24B940059B53A /* read_bb.c in Sources */,
 				6AD426F629E2929C0059B53A /* fallocate.c in Sources */,
 				6AD426CC29E25D2A0059B53A /* bitops.c in Sources */,

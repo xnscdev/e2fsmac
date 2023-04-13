@@ -66,8 +66,12 @@ ext2_vnop_lookup (struct vnop_lookup_args *args)
   vnode_t dvp = args->a_dvp;
   vnode_t *vpp = args->a_vpp;
   struct componentname *cnp = args->a_cnp;
+  struct ext2_fsnode *fsnode;
   vnode_t vp = NULL;
+  ext2_ino_t ino;
+
   kassert (vnode_isdir (dvp));
+  fsnode = vnode_fsnode (dvp);
 
   if (!strcmp (cnp->cn_nameptr, ".")
       || ((cnp->cn_flags & ISDOTDOT) && vnode_isvroot (dvp)))
@@ -84,8 +88,13 @@ ext2_vnop_lookup (struct vnop_lookup_args *args)
     }
   else
     {
-      log_debug ("lookup: bad cnp: %s", cnp->cn_nameptr);
-      ret = ENOENT;
+      ret = ext2fs_namei (emp->fs, EXT2_ROOT_INO, fsnode->ino,
+			  cnp->cn_nameptr, &ino);
+      if (ret)
+	log_debug ("lookup failed: cnp: %s, errno: %d", cnp->cn_nameptr, ret);
+      ret = ext2_create_vnode (emp, ino, dvp, &vp);
+      if (ret)
+	log_debug ("ext2_create_vnode(): errno %d", ret);
     }
 
   *vpp = vp;
