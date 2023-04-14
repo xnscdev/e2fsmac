@@ -66,14 +66,18 @@ ext2_vnop_lookup (struct vnop_lookup_args *args)
   vnode_t dvp = args->a_dvp;
   vnode_t *vpp = args->a_vpp;
   struct componentname *cnp = args->a_cnp;
+  struct ext2_mount *emp = vfs_fsprivate (vnode_mount (dvp));
   struct ext2_fsnode *fsnode;
   vnode_t vp = NULL;
+  char name[EXT2_NAME_LEN + 1];
   ext2_ino_t ino;
 
   kassert (vnode_isdir (dvp));
   fsnode = vnode_fsnode (dvp);
 
-  if (!strcmp (cnp->cn_nameptr, ".")
+  strlcpy (name, cnp->cn_nameptr, cnp->cn_namelen + 1);
+
+  if ((name[0] == '.' && name[1] == '\0')
       || ((cnp->cn_flags & ISDOTDOT) && vnode_isvroot (dvp)))
     {
       ret = vnode_get (dvp);
@@ -88,19 +92,36 @@ ext2_vnop_lookup (struct vnop_lookup_args *args)
     }
   else
     {
-      ret = ext2fs_namei (emp->fs, EXT2_ROOT_INO, fsnode->ino,
-			  cnp->cn_nameptr, &ino);
+      ret = ext2fs_namei (emp->fs, EXT2_ROOT_INO, fsnode->ino, name, &ino);
       if (ret)
-	log_debug ("lookup failed: cnp: %s, errno: %d", cnp->cn_nameptr, ret);
+	{
+	  ret = ENOENT;
+	  log_debug ("lookup failed: name: %s, cnp: %s, errno: %d",
+		     name, cnp->cn_nameptr, ret);
+	  goto out;
+	}
       ret = ext2_create_vnode (emp, ino, dvp, &vp);
       if (ret)
-	log_debug ("ext2_create_vnode(): errno %d", ret);
+	{
+	  ret = EIO;
+	  log_debug ("ext2_create_vnode(): errno %d", ret);
+	  goto out;
+	}
+      ret = ext2_open_vnode (emp, vp, 0);
+      if (ret)
+	{
+	  ret = EIO;
+	  log_debug ("ext2_open_vnode(): errno %d", ret);
+	  vnode_put (vp);
+	  goto out;
+	}
     }
 
   *vpp = vp;
+ out:
   if (!ret)
-    log_debug ("lookup: dvp: %#x, name: %s, vpp: %#x",
-	       vnode_vid (dvp), cnp->cn_nameptr, vnode_vid (vp));
+    log_debug ("lookup: dvp: %#x, nameptr: %s, name: %s, vpp: %#x",
+	       vnode_vid (dvp), cnp->cn_nameptr, name, vnode_vid (vp));
   return ret;
 }
 
