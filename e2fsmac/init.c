@@ -75,6 +75,7 @@ e2fsmac_stop(kmod_info_t *ki, void *d)
     }
 
   lck_grp_free (ext2_lck_grp);
+  cleanup ();
 #ifdef DEBUG
   kmemassert ();
 #endif

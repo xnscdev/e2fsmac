@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6A35114429E8E877008CC3C3 /* cleanup.c in Sources */ = {isa = PBXBuildFile; fileRef = 6A35114329E8E877008CC3C3 /* cleanup.c */; };
 		6AB795C029E8AF950069F348 /* namei.c in Sources */ = {isa = PBXBuildFile; fileRef = 6AB795BF29E8AF950069F348 /* namei.c */; };
 		6ABB369229DE909C000961B3 /* init.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB369129DE909C000961B3 /* init.c */; };
 		6ABB36B329DE9A4C000961B3 /* e2fsmac.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36B229DE9A4C000961B3 /* e2fsmac.h */; };
@@ -104,6 +105,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6A35114329E8E877008CC3C3 /* cleanup.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cleanup.c; sourceTree = "<group>"; };
 		6AB795BF29E8AF950069F348 /* namei.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = namei.c; sourceTree = "<group>"; };
 		6ABB368E29DE909C000961B3 /* e2fsmac.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = e2fsmac.kext; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ABB369129DE909C000961B3 /* init.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = init.c; sourceTree = "<group>"; };
@@ -243,6 +245,7 @@
 				6AD4267929E1E7D20059B53A /* vio.c */,
 				6AD4269929E24AD30059B53A /* time.c */,
 				6AD426FD29E317CC0059B53A /* util.h */,
+				6A35114329E8E877008CC3C3 /* cleanup.c */,
 			);
 			path = e2fsmac;
 			sourceTree = "<group>";
@@ -503,6 +506,7 @@
 				6AD426F829E2929C0059B53A /* nls_utf8.c in Sources */,
 				6AD4268829E239770059B53A /* hashmap.c in Sources */,
 				6AD4269329E23C630059B53A /* crc32c.c in Sources */,
+				6A35114429E8E877008CC3C3 /* cleanup.c in Sources */,
 				6AD426E729E26B520059B53A /* get_num_dirs.c in Sources */,
 				6AD426C629E25C1B0059B53A /* symlink.c in Sources */,
 				6AD426C429E25C1B0059B53A /* rbtree.c in Sources */,

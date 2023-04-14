@@ -51,9 +51,10 @@ e2fsmac_realloc (void *ptr, size_t old, size_t new, int flags)
 void
 e2fsmac_free (void *ptr)
 {
+  if (!ptr)
+    return;
 #ifdef DEBUG
-  if (ptr)
-    OSDecrementAtomic64 (&refcnt);
+  OSDecrementAtomic64 (&refcnt);
 #endif
   _FREE (ptr, M_TEMP);
 }

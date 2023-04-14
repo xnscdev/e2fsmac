@@ -35,6 +35,8 @@
 #include "ext2_fs.h"
 #include "ext2fs.h"
 
+void    *__ext2fs_zero_blocks2_buf;
+
 /*
  * Convenience function which zeros out _num_ blocks starting at
  * _blk_.  In case of an error, the details of the error is returned
@@ -50,15 +52,14 @@ errcode_t ext2fs_zero_blocks2(ext2_filsys fs, blk64_t blk, int num,
 			      blk64_t *ret_blk, int *ret_count)
 {
 	int		j, count;
-	static void	*buf;
 	static int	stride_length;
 	errcode_t	retval;
 
 	/* If fs is null, clean up the static buffer and return */
 	if (!fs) {
-		if (buf) {
-			e2fsmac_free(buf);
-			buf = 0;
+		if (__ext2fs_zero_blocks2_buf) {
+			e2fsmac_free(__ext2fs_zero_blocks2_buf);
+			__ext2fs_zero_blocks2_buf = 0;
 			stride_length = 0;
 		}
 		return 0;
@@ -80,12 +81,12 @@ errcode_t ext2fs_zero_blocks2(ext2_filsys fs, blk64_t blk, int num,
 
 		if (new_stride > MAX_STRIDE_LENGTH)
 			new_stride = MAX_STRIDE_LENGTH;
-		p = e2fsmac_realloc(buf, fs->blocksize * stride_length, fs->blocksize * new_stride, 0);
+		p = e2fsmac_realloc(__ext2fs_zero_blocks2_buf, fs->blocksize * stride_length, fs->blocksize * new_stride, 0);
 		if (!p)
 			return EXT2_ET_NO_MEMORY;
-		buf = p;
+		__ext2fs_zero_blocks2_buf = p;
 		stride_length = new_stride;
-		memset(buf, 0, fs->blocksize * stride_length);
+		memset(__ext2fs_zero_blocks2_buf, 0, fs->blocksize * stride_length);
 	}
 	/* OK, do the write loop */
 	j=0;
@@ -99,7 +100,7 @@ errcode_t ext2fs_zero_blocks2(ext2_filsys fs, blk64_t blk, int num,
 			if (count > stride_length)
 				count = stride_length;
 		}
-		retval = io_channel_write_blk64(fs->io, blk, count, buf);
+		retval = io_channel_write_blk64(fs->io, blk, count, __ext2fs_zero_blocks2_buf);
 		if (retval) {
 			if (ret_count)
 				*ret_count = count;

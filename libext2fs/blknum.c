@@ -14,6 +14,8 @@
 #include "config.h"
 #include "ext2fs.h"
 
+char    *__ext2fs_group_desc_buf;
+
 /*
  * Return the group # of a block
  */
@@ -203,7 +205,6 @@ struct ext2_group_desc *ext2fs_group_desc(ext2_filsys fs,
 {
 	struct ext2_group_desc *ret_gdp;
 	errcode_t	retval;
-	static char	*buf = 0;
 	static unsigned	bufsize = 0;
 	blk64_t		blk;
 	int		desc_size = EXT2_DESC_SIZE(fs->super) & ~7;
@@ -219,20 +220,20 @@ struct ext2_group_desc *ext2fs_group_desc(ext2_filsys fs,
 	 * opened, then read it on demand here.
 	 */
 	if (bufsize < fs->blocksize)
-		ext2fs_free_mem(&buf);
-	if (!buf) {
-		retval = ext2fs_get_mem(fs->blocksize, &buf);
+		ext2fs_free_mem(&__ext2fs_group_desc_buf);
+	if (!__ext2fs_group_desc_buf) {
+		retval = ext2fs_get_mem(fs->blocksize, &__ext2fs_group_desc_buf);
 		if (retval)
 			return NULL;
 		bufsize = fs->blocksize;
 	}
 	blk = ext2fs_descriptor_block_loc2(fs, fs->super->s_first_data_block,
 					   group / desc_per_blk);
-	retval = io_channel_read_blk(fs->io, blk, 1, buf);
+	retval = io_channel_read_blk(fs->io, blk, 1, __ext2fs_group_desc_buf);
 	if (retval)
 		return NULL;
 	ret_gdp = (struct ext2_group_desc *)
-		(buf + ((group % desc_per_blk) * desc_size));
+		(__ext2fs_group_desc_buf + ((group % desc_per_blk) * desc_size));
 #ifdef WORDS_BIGENDIAN
 	ext2fs_swap_group_desc2(fs, ret_gdp);
 #endif
