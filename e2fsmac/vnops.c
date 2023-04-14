@@ -36,6 +36,76 @@ uiomove_atomic (void *addr, size_t size, uio_t uio)
   return ret;
 }
 
+struct ext2_readdir_private
+{
+  uio_t uio;
+  int num;
+  int stopped;
+  off_t start;
+  struct ext2_super_block *super;
+};
+
+static int
+ext2_readdir_process (struct ext2_dir_entry *dirent, int offset, int blocksize,
+		      char *buffer, void *data)
+{
+  struct ext2_readdir_private *private = data;
+  struct dirent di;
+  int ret;
+  int file_type = DT_UNKNOWN;
+
+  if (offset < private->start)
+    return 0;
+
+  di.d_fileno = dirent->inode;
+  di.d_reclen = dirent->rec_len;
+
+  if (ext2fs_has_feature_filetype (private->super))
+    {
+      switch (ext2fs_dirent_file_type (dirent))
+	{
+	case EXT2_FT_REG_FILE:
+	  file_type = DT_REG;
+	  break;
+	case EXT2_FT_DIR:
+	  file_type = DT_DIR;
+	  break;
+	case EXT2_FT_CHRDEV:
+	  file_type = DT_CHR;
+	  break;
+	case EXT2_FT_BLKDEV:
+	  file_type = DT_BLK;
+	  break;
+	case EXT2_FT_FIFO:
+	  file_type = DT_FIFO;
+	  break;
+	case EXT2_FT_SOCK:
+	  file_type = DT_SOCK;
+	  break;
+	case EXT2_FT_SYMLINK:
+	  file_type = DT_LNK;
+	  break;
+	}
+    }
+  di.d_type = file_type;
+
+  di.d_namlen = ext2fs_dirent_name_len (dirent);
+  strlcpy (di.d_name, dirent->name, sizeof di.d_name);
+
+  ret = uiomove_atomic (&di, sizeof di, private->uio);
+  if (ret == ENOBUFS)
+    {
+      private->stopped = 1;
+      return DIRENT_ABORT;
+    }
+  if (ret)
+    return DIRENT_ERROR | DIRENT_ABORT;
+
+  private->num++;
+  uio_setoffset (private->uio, offset + 1);
+  return 0;
+}
+
 static void
 ext2_detach_root_vnode (struct ext2_mount *emp, vnode_t vp)
 {
@@ -194,78 +264,50 @@ ext2_vnop_getattr (struct vnop_getattr_args *args)
 static int
 ext2_vnop_readdir (struct vnop_readdir_args *args)
 {
-  static int known_flags = VNODE_READDIR_EXTENDED
+  static int known_flags =
+    VNODE_READDIR_EXTENDED
     | VNODE_READDIR_REQSEEKOFF
     | VNODE_READDIR_SEEKOFF32
     | VNODE_READDIR_NAMEMAX;
-  int err = 0;
+  int ret = 0;
   vnode_t vp = args->a_vp;
-  struct uio *uio = args->a_uio;
+  uio_t uio = args->a_uio;
   int flags = args->a_flags;
   int *eofflag = args->a_eofflag;
   int *numdirent = args->a_numdirent;
-  int eof = 0;
-  int num = 0;
-  struct dirent di;
-  off_t index;
+  struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vp));
+  struct ext2_fsnode *fsnode = vnode_fsnode (vp);
+  struct ext2_readdir_private private;
 
   if (flags & known_flags)
     {
-      err = EINVAL;
+      ret = EINVAL;
       log_debug ("found NFS-exported readdir flags %#x: errno %d",
-		 flags & known_flags, err);
+		 flags & known_flags, ret);
       goto err0;
     }
 
-  di.d_fileno = 2;
-  di.d_reclen = sizeof di;
-  di.d_type = DT_DIR;
+  private.uio = uio;
+  private.num = 0;
+  private.stopped = 0;
+  private.start = uio_offset (uio);
+  private.super = emp->fs->super;
 
-  kassert (uio_offset (uio) % 7 == 0);
-  index = uio_offset (uio) / 7;
-
-  if (!index)
-    {
-      di.d_namlen = (uint8_t) strlen (".");
-      strlcpy (di.d_name, ".", sizeof di.d_name);
-      err = uiomove_atomic (&di, sizeof di, uio);
-      if (!err)
-	{
-	  num++;
-	  index++;
-	}
-    }
-
-  if (!err && index == 1)
-    {
-      di.d_namlen = (uint8_t) strlen ("..");
-      strlcpy (di.d_name, "..", sizeof di.d_name);
-      err = uiomove_atomic (&di, sizeof di, uio);
-      if (!err)
-	{
-	  num++;
-	  index++;
-	}
-    }
-
-  if (err == ENOBUFS)
-    err = 0;
-  else if (err)
+  ret = ext2fs_dir_iterate (emp->fs, fsnode->ino, 0, NULL,
+			    ext2_readdir_process, &private);
+  if (ret)
     goto err0;
 
-  uio_setoffset (uio, index * 7);
-  eof = index > 1;
-
   if (eofflag)
-    *eofflag = eof;
+    *eofflag = !private.stopped;
   if (numdirent)
-    *numdirent = num;
+    *numdirent = private.num;
 
   log_debug ("readdir: vnode: %#x, eofflag: %d, numdirent: %d",
-	     vnode_vid (vp), eof, num);
+	     vnode_vid (vp), !private.stopped, private.num);
 
  err0:
-  return err;
+  return ret;
 }
 
 static int
