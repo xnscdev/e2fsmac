@@ -17,6 +17,15 @@
 #include <sys/dirent.h>
 #include "e2fsmac.h"
 
+struct ext2_readdir_private
+{
+  uio_t uio;
+  int num;
+  int stopped;
+  off_t start;
+  struct ext2_super_block *super;
+};
+
 int (**ext2_vnop_p) (void *);
 
 static int
@@ -36,31 +45,23 @@ uiomove_atomic (void *addr, size_t size, uio_t uio)
   return ret;
 }
 
-struct ext2_readdir_private
-{
-  uio_t uio;
-  int num;
-  int stopped;
-  off_t start;
-  struct ext2_super_block *super;
-};
-
 static int
 ext2_readdir_process (struct ext2_dir_entry *dirent, int offset, int blocksize,
 		      char *buffer, void *data)
 {
-  struct ext2_readdir_private *private = data;
+  struct ext2_readdir_private *priv = data;
   struct dirent di;
   int ret;
   int file_type = DT_UNKNOWN;
 
-  if (offset < private->start)
+  uio_setoffset (priv->uio, offset);
+  if (offset < priv->start)
     return 0;
 
   di.d_fileno = dirent->inode;
-  di.d_reclen = dirent->rec_len;
+  di.d_reclen = sizeof di;
 
-  if (ext2fs_has_feature_filetype (private->super))
+  if (ext2fs_has_feature_filetype (priv->super))
     {
       switch (ext2fs_dirent_file_type (dirent))
 	{
@@ -90,19 +91,20 @@ ext2_readdir_process (struct ext2_dir_entry *dirent, int offset, int blocksize,
   di.d_type = file_type;
 
   di.d_namlen = ext2fs_dirent_name_len (dirent);
-  strlcpy (di.d_name, dirent->name, sizeof di.d_name);
+  strlcpy (di.d_name, dirent->name, di.d_namlen + 1);
 
-  ret = uiomove_atomic (&di, sizeof di, private->uio);
+  ret = uiomove_atomic (&di, sizeof di, priv->uio);
   if (ret == ENOBUFS)
     {
-      private->stopped = 1;
+      priv->stopped = 1;
       return DIRENT_ABORT;
     }
   if (ret)
     return DIRENT_ERROR | DIRENT_ABORT;
 
-  private->num++;
-  uio_setoffset (private->uio, offset + 1);
+  priv->num++;
+  log_debug ("readdir: entry #%d: %s, offset: %d",
+	     priv->num, di.d_name, offset);
   return 0;
 }
 
@@ -162,7 +164,8 @@ ext2_vnop_lookup (struct vnop_lookup_args *args)
     }
   else
     {
-      ret = ext2fs_namei (emp->fs, EXT2_ROOT_INO, fsnode->ino, name, &ino);
+      ret = ext2fs_lookup (emp->fs, fsnode->ino, name, cnp->cn_namelen,
+			   NULL, &ino);
       if (ret)
 	{
 	  ret = ENOENT;
@@ -277,7 +280,7 @@ ext2_vnop_readdir (struct vnop_readdir_args *args)
   int *numdirent = args->a_numdirent;
   struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vp));
   struct ext2_fsnode *fsnode = vnode_fsnode (vp);
-  struct ext2_readdir_private private;
+  struct ext2_readdir_private priv;
 
   if (flags & known_flags)
     {
@@ -287,24 +290,24 @@ ext2_vnop_readdir (struct vnop_readdir_args *args)
       goto err0;
     }
 
-  private.uio = uio;
-  private.num = 0;
-  private.stopped = 0;
-  private.start = uio_offset (uio);
-  private.super = emp->fs->super;
+  priv.uio = uio;
+  priv.num = 0;
+  priv.stopped = 0;
+  priv.start = uio_offset (uio);
+  priv.super = emp->fs->super;
 
   ret = ext2fs_dir_iterate (emp->fs, fsnode->ino, 0, NULL,
-			    ext2_readdir_process, &private);
+			    ext2_readdir_process, &priv);
   if (ret)
     goto err0;
 
   if (eofflag)
-    *eofflag = !private.stopped;
+    *eofflag = !priv.stopped;
   if (numdirent)
-    *numdirent = private.num;
+    *numdirent = priv.num;
 
   log_debug ("readdir: vnode: %#x, eofflag: %d, numdirent: %d",
-	     vnode_vid (vp), !private.stopped, private.num);
+	     vnode_vid (vp), !priv.stopped, priv.num);
 
  err0:
   return ret;
