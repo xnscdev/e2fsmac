@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6A35114429E8E877008CC3C3 /* cleanup.c in Sources */ = {isa = PBXBuildFile; fileRef = 6A35114329E8E877008CC3C3 /* cleanup.c */; };
+		6A88C21529EBA638007624FB /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = 6A88C21429EBA638007624FB /* error.c */; };
 		6AB795C029E8AF950069F348 /* namei.c in Sources */ = {isa = PBXBuildFile; fileRef = 6AB795BF29E8AF950069F348 /* namei.c */; };
 		6ABB369229DE909C000961B3 /* init.c in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB369129DE909C000961B3 /* init.c */; };
 		6ABB36B329DE9A4C000961B3 /* e2fsmac.h in Headers */ = {isa = PBXBuildFile; fileRef = 6ABB36B229DE9A4C000961B3 /* e2fsmac.h */; };
@@ -106,6 +107,7 @@
 
 /* Begin PBXFileReference section */
 		6A35114329E8E877008CC3C3 /* cleanup.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cleanup.c; sourceTree = "<group>"; };
+		6A88C21429EBA638007624FB /* error.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = error.c; sourceTree = "<group>"; };
 		6AB795BF29E8AF950069F348 /* namei.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = namei.c; sourceTree = "<group>"; };
 		6ABB368E29DE909C000961B3 /* e2fsmac.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = e2fsmac.kext; sourceTree = BUILT_PRODUCTS_DIR; };
 		6ABB369129DE909C000961B3 /* init.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = init.c; sourceTree = "<group>"; };
@@ -246,6 +248,7 @@
 				6AD4269929E24AD30059B53A /* time.c */,
 				6AD426FD29E317CC0059B53A /* util.h */,
 				6A35114329E8E877008CC3C3 /* cleanup.c */,
+				6A88C21429EBA638007624FB /* error.c */,
 			);
 			path = e2fsmac;
 			sourceTree = "<group>";
@@ -484,6 +487,7 @@
 				6AD4268729E239770059B53A /* blknum.c in Sources */,
 				6AD426AD29E2510F0059B53A /* alloc.c in Sources */,
 				6ABB378629DF38B7000961B3 /* vfsops.c in Sources */,
+				6A88C21529EBA638007624FB /* error.c in Sources */,
 				6AD426F029E26E140059B53A /* inline.c in Sources */,
 				6AD426DA29E263BB0059B53A /* dir_iterate.c in Sources */,
 				6AD4267A29E1E7D20059B53A /* vio.c in Sources */,

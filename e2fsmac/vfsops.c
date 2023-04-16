@@ -262,7 +262,10 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
     }
 
   if (flags & EXT2_FLAG_RW)
-    emp->fs->super->s_mtime = get_time ();
+    {
+      emp->fs->super->s_mtime = get_time ();
+      ext2fs_mark_super_dirty (emp->fs);
+    }
 
   st = vfs_statfs (mp);
   kassert (st);
@@ -279,7 +282,7 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
 
  err0:
   kassert (!ext2_vfsop_unmount (mp, MNT_FORCE, ctx));
-  return ret;
+  return TRANSLATE_ERROR (emp->fs, ret, EXT2_ROOT_INO);
 }
 
 static int
@@ -335,9 +338,10 @@ ext2_vfsop_unmount (struct mount *mp, int flags, vfs_context_t ctx)
   emp->magic = 0;
   log ("unmount: emp: %p", emp);
   e2fsmac_free (emp);
+  return 0;
 
  err0:
-  return ret;
+  return TRANSLATE_ERROR (emp->fs, ret, EXT2_ROOT_INO);
 }
 
 static int
@@ -352,7 +356,7 @@ ext2_vfsop_root (struct mount *mp, vnode_t *vpp, vfs_context_t ctx)
   *vpp = vp;
   if (!ret)
     log_debug ("root: vnode: %#x", vnode_vid (vp));
-  return ret;
+  return TRANSLATE_ERROR (emp->fs, ret, EXT2_ROOT_INO);
 }
 
 static int
@@ -419,9 +423,12 @@ ext2_vfsop_getattr (struct mount *mp, struct vfs_attr *attr, vfs_context_t ctx)
 static int
 ext2_vfsop_sync (struct mount *mp, int waitfor, vfs_context_t ctx)
 {
+  int ret;
   struct ext2_mount *emp = vfs_fsprivate (mp);
   kassert (emp);
-  return ext2fs_flush (emp->fs);
+
+  ret = ext2fs_flush (emp->fs);
+  return TRANSLATE_ERROR (emp->fs, ret, EXT2_ROOT_INO);
 }
 
 struct vfsops ext2_vfsops =

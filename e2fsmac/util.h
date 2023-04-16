@@ -28,7 +28,8 @@
 #define log(fmt, ...)           printf ("e2fsmac: " fmt "\n", ##__VA_ARGS__)
 #ifdef DEBUG
 #define log_debug(fmt, ...)						\
-  printf ("e2fsmac: " fmt " (%s:%d)\n", ##__VA_ARGS__, __func__, __LINE__)
+  printf ("e2fsmac: " fmt " (%s %s:%d)\n", ##__VA_ARGS__, __func__, __FILE__, \
+	  __LINE__)
 #else
 #define log_debug(fmt, ...) ((void) 0)
 #endif

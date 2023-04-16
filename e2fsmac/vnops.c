@@ -287,7 +287,7 @@ ext2_vnop_lookup (struct vnop_lookup_args *args)
   if (!ret)
     log_debug ("lookup: dvp: %#x, nameptr: %s, name: %s, vpp: %#x",
 	       vnode_vid (dvp), cnp->cn_nameptr, name, vnode_vid (vp));
-  return ret;
+  return TRANSLATE_ERROR (emp->fs, ret, fsnode->ino);
 }
 
 static int
@@ -317,7 +317,7 @@ ext2_vnop_open (struct vnop_open_args *args)
 	     vnode_fsnode (vp),
 	     (mode & FREAD) ? " FREAD" : "",
 	     (mode & FWRITE) ? " FWRITE" : "");
-  return ret;
+  return TRANSLATE_ERROR (emp->fs, ret, fsnode->ino);
 }
 
 static int
@@ -348,7 +348,7 @@ ext2_vnop_getattr (struct vnop_getattr_args *args)
       ret = ext2fs_read_inode_full (emp->fs, fsnode->ino,
 				    (struct ext2_inode *) &inode, sizeof inode);
       if (ret)
-	return ret;
+	goto out;
       pinode = &inode;
       EXT4_INODE_GET_XTIME (i_ctime, &create_time, pinode);
       EXT4_INODE_GET_XTIME (i_atime, &access_time, pinode);
@@ -376,7 +376,9 @@ ext2_vnop_getattr (struct vnop_getattr_args *args)
   VATTR_RETURN (vap, va_fileid, fsnode->ino);
   VATTR_RETURN (vap, va_fsid, emp->devid);
   log_debug ("getattr: vnode: %#x", vnode_vid (vp));
-  return ret;
+
+ out:
+  return TRANSLATE_ERROR (emp->fs, ret, fsnode->ino);
 }
 
 static int
@@ -402,7 +404,7 @@ ext2_vnop_readdir (struct vnop_readdir_args *args)
       ret = EINVAL;
       log_debug ("found NFS-exported readdir flags %#x: errno %d",
 		 flags & known_flags, ret);
-      return ret;
+      goto out;
     }
 
   priv.uio = uio;
@@ -414,13 +416,13 @@ ext2_vnop_readdir (struct vnop_readdir_args *args)
   ret = ext2fs_dir_iterate (emp->fs, fsnode->ino, 0, NULL,
 			    ext2_readdir_process, &priv);
   if (ret)
-    return ret;
+    goto out;
 
   if (emp->fs->flags & EXT2_FLAG_RW)
     {
       ret = update_atime (emp->fs, fsnode);
       if (ret)
-	return ret;
+	goto out;
     }
 
   if (eofflag)
@@ -430,7 +432,9 @@ ext2_vnop_readdir (struct vnop_readdir_args *args)
 
   log_debug ("readdir: vnode: %#x, eofflag: %d, numdirent: %d",
 	     vnode_vid (vp), !priv.stopped, priv.num);
-  return ret;
+
+ out:
+  return TRANSLATE_ERROR (emp->fs, ret, fsnode->ino);
 }
 
 static int

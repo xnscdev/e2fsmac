@@ -56,4 +56,10 @@ int ext2_create_vnode (struct ext2_mount *emp, ext2_ino_t ino, vnode_t dvp,
 		       vnode_t *vpp);
 int ext2_open_vnode (struct ext2_mount *emp, vnode_t vp, int flags);
 
+int translate_error (ext2_filsys fs, int err, ext2_ino_t ino, const char *file,
+		     int line);
+
+#define TRANSLATE_ERROR(fs, err, ino)			\
+  translate_error (fs, err, ino, __FILE__, __LINE__)
+
 #endif
