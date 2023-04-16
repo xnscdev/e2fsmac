@@ -189,6 +189,8 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
   struct ext2_mount *emp;
   struct vfsstatfs *st;
   kauth_cred_t cred;
+  int flags;
+  int mp_flags;
 
   if (vfs_isupdate (mp) || vfs_iswriteupgrade (mp))
     {
@@ -210,6 +212,13 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
       log ("bad mount magic number: %#x", args.magic);
       goto err0;
     }
+
+  flags = 0;
+  if (!args.readonly)
+    flags |= EXT2_FLAG_RW;
+  mp_flags = MNT_NOSUID | MNT_NODEV;
+  if (args.readonly)
+    mp_flags |= MNT_RDONLY;
 
   emp = e2fsmac_malloc (sizeof *emp, M_ZERO);
   if (unlikely (!emp))
@@ -245,12 +254,15 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
   kassert (!emp->wait_root);
   kassert (!emp->rootvp);
 
-  ret = ext2fs_open (emp->devvp, 0, 0, 0, default_io_manager, &emp->fs);
+  ret = ext2fs_open (emp->devvp, flags, 0, 0, default_io_manager, &emp->fs);
   if (ret)
     {
       log ("ext2fs_open(): errno %d", ret);
       goto err0;
     }
+
+  if (flags & EXT2_FLAG_RW)
+    emp->fs->super->s_mtime = get_time ();
 
   st = vfs_statfs (mp);
   kassert (st);
@@ -261,7 +273,7 @@ ext2_vfsop_mount (struct mount *mp, vnode_t devvp, user_addr_t data,
   emp->uid = kauth_cred_getuid (cred);
   emp->gid = kauth_cred_getgid (cred);
 
-  vfs_setflags (mp, MNT_RDONLY | MNT_NOSUID | MNT_NODEV);
+  vfs_setflags (mp, mp_flags);
   log ("mount: devid: %#x", emp->devid);
   return 0;
 
@@ -288,13 +300,15 @@ ext2_vfsop_unmount (struct mount *mp, int flags, vfs_context_t ctx)
   ret = vflush (mp, NULL, flush_flags);
   if (ret)
     {
-      log ("vflush(): errno %d", ret);
+      log_debug ("vflush(): errno %d", ret);
       goto err0;
     }
 
   emp = vfs_fsprivate (mp);
   if (!emp)
     goto err0;
+
+  log_debug ("unmount: emp exists");
 
   if (emp->fs)
     {
@@ -350,7 +364,6 @@ ext2_vfsop_getattr (struct mount *mp, struct vfs_attr *attr, vfs_context_t ctx)
   struct timespec modify_time = { 0, 0 };
   struct timespec access_time = { 0, 0 };
   fsid_t fsid;
-  uuid_t uuid;
   blk64_t blocks_cnt;
   blk64_t free_cnt;
   blk64_t res_cnt;
@@ -360,8 +373,6 @@ ext2_vfsop_getattr (struct mount *mp, struct vfs_attr *attr, vfs_context_t ctx)
 
   fsid.val[0] = emp->devid;
   fsid.val[1] = vfs_typenum (emp->mp);
-
-  uuid_generate_random (uuid);
 
   blocks_cnt = ext2fs_blocks_count (super);
   free_cnt = ext2fs_free_blocks_count (super);
@@ -405,11 +416,20 @@ ext2_vfsop_getattr (struct mount *mp, struct vfs_attr *attr, vfs_context_t ctx)
   return 0;
 }
 
+static int
+ext2_vfsop_sync (struct mount *mp, int waitfor, vfs_context_t ctx)
+{
+  struct ext2_mount *emp = vfs_fsprivate (mp);
+  kassert (emp);
+  return ext2fs_flush (emp->fs);
+}
+
 struct vfsops ext2_vfsops =
   {
     .vfs_mount = ext2_vfsop_mount,
     .vfs_start = ext2_vfsop_start,
     .vfs_unmount = ext2_vfsop_unmount,
     .vfs_root = ext2_vfsop_root,
-    .vfs_getattr = ext2_vfsop_getattr
+    .vfs_getattr = ext2_vfsop_getattr,
+    .vfs_sync = ext2_vfsop_sync
   };

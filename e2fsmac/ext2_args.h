@@ -28,6 +28,7 @@ struct ext2_args
   char *fspec;
 #endif
   int magic;
+  int readonly;
 };
 
 #endif

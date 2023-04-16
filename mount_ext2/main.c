@@ -24,15 +24,17 @@
 static struct option opts[] =
   {
     {"version", no_argument, NULL, 'v'},
-    {"help", no_argument, NULL, 'h'}
+    {"help", no_argument, NULL, 'h'},
+    {"readonly", no_argument, NULL, 'r'}
   };
 
 static void
 usage (void)
 {
-  fprintf (stderr, "Usage: mount_ext2 fspec mp\n"
+  fprintf (stderr, "Usage: mount_ext2 [-r] fspec mp\n"
 	   "       mount_ext2 -h\n"
 	   "  -h, --help          Print help\n"
+	   "  -r, --readonly      Mount read-only\n"
 	   "  fspec               Special device to mount\n"
 	   "  mp                  Mount point\n");
 }
@@ -47,13 +49,16 @@ main (int argc, char **argv)
   struct ext2_args args;
   int err;
 
-  while ((ch = getopt_long (argc, argv, "h", opts, NULL)) != -1)
+  while ((ch = getopt_long (argc, argv, "hr", opts, NULL)) != -1)
     {
       switch (ch)
 	{
 	case 'h':
 	  usage ();
 	  exit (0);
+	case 'r':
+	  args.readonly = 1;
+	  break;
 	default:
 	  usage ();
 	  exit (1);

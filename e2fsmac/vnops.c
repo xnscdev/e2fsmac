@@ -28,6 +28,98 @@ struct ext2_readdir_private
 
 int (**ext2_vnop_p) (void *);
 
+#define EXT4_EPOCH_BITS         2
+#define EXT4_EPOCH_MASK         ((1 << EXT4_EPOCH_BITS) - 1)
+#define EXT4_NSEC_MASK          (~0UL << EXT4_EPOCH_BITS)
+
+static inline uint32_t
+ext4_encode_extra_time (const struct timespec *tp)
+{
+  uint32_t extra = sizeof tp->tv_sec > 4 ?
+    ((tp->tv_sec - (int) tp->tv_sec) >> 32) & EXT4_EPOCH_MASK : 0;
+  return extra | (tp->tv_nsec << EXT4_EPOCH_BITS);
+}
+
+static inline void
+ext4_decode_extra_time (struct timespec *tp, uint32_t extra)
+{
+  if (sizeof tp->tv_sec > 4 && (extra & EXT4_EPOCH_MASK))
+    {
+      uint64_t extra_bits = extra & EXT4_EPOCH_MASK;
+      tp->tv_sec += extra_bits << 32;
+    }
+  tp->tv_nsec = (extra & EXT4_NSEC_MASK) >> EXT4_EPOCH_BITS;
+}
+
+#define EXT4_FITS_IN_INODE(inode, field)				\
+  (offsetof (typeof (*(inode)), field) + sizeof ((inode)->field)	\
+   <= (size_t) EXT2_GOOD_OLD_INODE_SIZE + (inode)->i_extra_isize)
+
+#define EXT4_INODE_GET_XTIME(xtime, timespec, raw_inode)		\
+  do									\
+    {									\
+      (timespec)->tv_sec = (raw_inode)->xtime;				\
+      if (EXT4_FITS_IN_INODE (raw_inode, xtime ## _extra))		\
+	ext4_decode_extra_time (timespec, (raw_inode)->xtime ## _extra); \
+      else								\
+	(timespec)->tv_nsec = 0;					\
+    }									\
+  while (0)
+
+#define EXT4_INODE_SET_XTIME(xtime, timespec, raw_inode)		\
+  do									\
+    {									\
+      (raw_inode)->xtime = (timespec)->tv_sec;				\
+      if (EXT4_FITS_IN_INODE (raw_inode, xtime ## _extra))		\
+	(raw_inode)->xtime ## _extra = ext4_encode_extra_time (timespec); \
+    }									\
+  while (0)
+
+static int
+update_large_inode (ext2_filsys fs, struct ext2_fsnode *fsnode,
+		    struct ext2_inode_large *inode)
+{
+  int ret;
+  ret = ext2fs_write_inode_full (fs, fsnode->ino, (struct ext2_inode *) inode,
+				 sizeof *inode);
+  if (ret)
+    return ret;
+  memcpy (fsnode->inode, inode, sizeof *fsnode->inode);
+  return 0;
+}
+
+static int
+update_atime (ext2_filsys fs, struct ext2_fsnode *fsnode)
+{
+  struct ext2_inode_large inode;
+  struct ext2_inode_large *pinode;
+  struct timespec atime;
+  struct timespec mtime;
+  struct timespec now;
+  int ret;
+
+  if (!(fs->flags & EXT2_FLAG_RW))
+    return 0;
+  memset (&inode, 0, sizeof inode);
+  ret = ext2fs_read_inode_full (fs, fsnode->ino, (struct ext2_inode *) &inode,
+				sizeof inode);
+  if (ret)
+    return ret;
+
+  pinode = &inode;
+  EXT4_INODE_GET_XTIME (i_atime, &atime, pinode);
+  EXT4_INODE_GET_XTIME (i_mtime, &mtime, pinode);
+  nanotime (&now);
+
+  if (atime.tv_sec >= mtime.tv_sec && atime.tv_sec >= now.tv_sec - 30)
+    return 0;
+  EXT4_INODE_SET_XTIME (i_atime, &now, pinode);
+  ret = update_large_inode (fs, fsnode, pinode);
+  if (ret)
+    return ret;
+  return 0;
+}
+
 static int
 uiomove_atomic (void *addr, size_t size, uio_t uio)
 {
@@ -243,9 +335,32 @@ ext2_vnop_getattr (struct vnop_getattr_args *args)
   struct vnode_attr *vap = args->a_vap;
   struct ext2_fsnode *fsnode = vnode_fsnode (vp);
   struct ext2_mount *emp = vfs_fsprivate (vnode_mount (vp));
-  struct timespec create_time = { fsnode->inode->i_ctime, 0 };
-  struct timespec access_time = { fsnode->inode->i_atime, 0 };
-  struct timespec modify_time = { fsnode->inode->i_mtime, 0 };
+  struct timespec create_time;
+  struct timespec access_time;
+  struct timespec modify_time;
+  int ret = 0;
+
+  if (EXT2_INODE_SIZE (emp->fs->super) > EXT2_GOOD_OLD_INODE_SIZE)
+    {
+      struct ext2_inode_large inode;
+      struct ext2_inode_large *pinode;
+      memset (&inode, 0, sizeof inode);
+      ret = ext2fs_read_inode_full (emp->fs, fsnode->ino,
+				    (struct ext2_inode *) &inode, sizeof inode);
+      if (ret)
+	return ret;
+      pinode = &inode;
+      EXT4_INODE_GET_XTIME (i_ctime, &create_time, pinode);
+      EXT4_INODE_GET_XTIME (i_atime, &access_time, pinode);
+      EXT4_INODE_GET_XTIME (i_mtime, &modify_time, pinode);
+    }
+  else
+    {
+      create_time.tv_sec = fsnode->inode->i_ctime;
+      access_time.tv_sec = fsnode->inode->i_atime;
+      modify_time.tv_sec = fsnode->inode->i_mtime;
+      create_time.tv_nsec = access_time.tv_nsec = modify_time.tv_nsec = 0;
+    }
 
   VATTR_RETURN (vap, va_rdev, 0);
   VATTR_RETURN (vap, va_nlink, fsnode->inode->i_links_count);
@@ -261,7 +376,7 @@ ext2_vnop_getattr (struct vnop_getattr_args *args)
   VATTR_RETURN (vap, va_fileid, fsnode->ino);
   VATTR_RETURN (vap, va_fsid, emp->devid);
   log_debug ("getattr: vnode: %#x", vnode_vid (vp));
-  return 0;
+  return ret;
 }
 
 static int
@@ -287,7 +402,7 @@ ext2_vnop_readdir (struct vnop_readdir_args *args)
       ret = EINVAL;
       log_debug ("found NFS-exported readdir flags %#x: errno %d",
 		 flags & known_flags, ret);
-      goto err0;
+      return ret;
     }
 
   priv.uio = uio;
@@ -299,7 +414,14 @@ ext2_vnop_readdir (struct vnop_readdir_args *args)
   ret = ext2fs_dir_iterate (emp->fs, fsnode->ino, 0, NULL,
 			    ext2_readdir_process, &priv);
   if (ret)
-    goto err0;
+    return ret;
+
+  if (emp->fs->flags & EXT2_FLAG_RW)
+    {
+      ret = update_atime (emp->fs, fsnode);
+      if (ret)
+	return ret;
+    }
 
   if (eofflag)
     *eofflag = !priv.stopped;
@@ -308,8 +430,6 @@ ext2_vnop_readdir (struct vnop_readdir_args *args)
 
   log_debug ("readdir: vnode: %#x, eofflag: %d, numdirent: %d",
 	     vnode_vid (vp), !priv.stopped, priv.num);
-
- err0:
   return ret;
 }
 

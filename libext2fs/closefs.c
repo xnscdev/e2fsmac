@@ -300,7 +300,7 @@ errcode_t ext2fs_flush2(ext2_filsys fs, int flags)
 	fs_state = fs->super->s_state;
 	feature_incompat = fs->super->s_feature_incompat;
 
-    fs->super->s_wtime = fs->now ? fs->now : get_time();
+	fs->super->s_wtime = fs->now ? fs->now : get_time();
 	fs->super->s_block_group_nr = 0;
 
 	/*
